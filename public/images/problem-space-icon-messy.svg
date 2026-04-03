@@ -1,0 +1,47 @@
+<?xml version="1.0" ?><svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <!-- Ethereal core gradient -->
+    <radialGradient id="fadingCenter" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFC0CB" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#9370DB" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft glowing overlaps -->
+    <radialGradient id="overlap1" cx="35%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#87CEFA" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="overlap2" cx="65%" cy="65%" r="60%">
+      <stop offset="0%" stop-color="#FF69B4" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Radiating tension lines -->
+  <g stroke="#CCCCCC" stroke-width="0.4" stroke-opacity="0.3">
+    <!-- 16 delicate lines from center outward -->
+    <line x1="100" y1="100" x2="100" y2="10"/>
+    <line x1="100" y1="100" x2="100" y2="190"/>
+    <line x1="100" y1="100" x2="10" y2="100"/>
+    <line x1="100" y1="100" x2="190" y2="100"/>
+    <line x1="100" y1="100" x2="30" y2="30"/>
+    <line x1="100" y1="100" x2="170" y2="30"/>
+    <line x1="100" y1="100" x2="30" y2="170"/>
+    <line x1="100" y1="100" x2="170" y2="170"/>
+    <line x1="100" y1="100" x2="50" y2="20"/>
+    <line x1="100" y1="100" x2="150" y2="20"/>
+    <line x1="100" y1="100" x2="20" y2="50"/>
+    <line x1="100" y1="100" x2="180" y2="50"/>
+    <line x1="100" y1="100" x2="20" y2="150"/>
+    <line x1="100" y1="100" x2="180" y2="150"/>
+    <line x1="100" y1="100" x2="50" y2="180"/>
+    <line x1="100" y1="100" x2="150" y2="180"/>
+  </g>
+
+  <!-- Glowing gradients -->
+  <circle cx="100" cy="100" r="80" fill="url(#fadingCenter)"/>
+  <circle cx="75" cy="75" r="70" fill="url(#overlap1)"/>
+  <circle cx="125" cy="125" r="70" fill="url(#overlap2)"/>
+</svg>
