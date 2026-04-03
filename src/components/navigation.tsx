@@ -68,7 +68,7 @@ export default function Navigation() {
           </div>
           {/* Right Section: Git Commit Data */}
           <div className="hidden md:flex items-center gap-3">
-            <span className="text-[#a1a1a1]">b33efc4</span>
+            <span className="text-[#a1a1a1]">7e035dd</span>
             <span>·</span>
             <div className="flex gap-1.5">
               <span className="text-[#32d74b]">-14,202</span>
