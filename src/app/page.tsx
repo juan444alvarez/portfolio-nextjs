@@ -193,7 +193,7 @@ export default function PortfolioPage() {
               className="text-gray-600 text-[0.9375rem] leading-relaxed w-full"
             >
               <p className="w-full">
-                I&apos;m a multidisciplinary designer and developer based in New York, working at the frontier of AI and design. At Notion, I design systems and tools that help people and organizations share knowledge and collaborate at scale.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
               </p>
             </motion.div>
           </div>
