@@ -20,9 +20,9 @@ const link =
 const type = {
   name: "text-[18px] font-semibold leading-tight text-neutral-800",
   subtext: "text-[13px] leading-none text-neutral-600",
-  body: "text-[16px] leading-[1.6] text-neutral-800 text-pretty",
-  section: "text-[16px] font-semibold text-neutral-800",
-  cardBody: "text-[16px] leading-[1.4] text-neutral-800 text-pretty",
+  body: "text-[16px] leading-[1.6] text-neutral-700 text-pretty",
+  section: "text-[16px] font-semibold text-neutral-700",
+  cardBody: "text-[16px] leading-[1.4] text-neutral-700 text-pretty",
 } as const;
 
 /* Icons carry the link blue at rest, darkening on hover like any other link. */
@@ -69,9 +69,33 @@ const SOCIALS: Social[] = [
   },
 ];
 
-const FOOTNOTES = [
-  { marker: "¹", text: "the agency to build ideas" },
-  { marker: "²", text: "a habit of continuous discovery for business needs" },
+type Footnote = {
+  marker: string;
+  text: string;
+  href: string;
+  /** Screen-reader name for the marker link — "1" alone is useless. */
+  label: string;
+};
+
+const FOOTNOTES: Footnote[] = [
+  {
+    marker: "1",
+    text: "the agency to build ideas",
+    href: "/work/ebara#approach",
+    label: "See this in the Ebara Website Redesign case study",
+  },
+  {
+    marker: "2",
+    text: "a habit of continuous discovery for business needs",
+    href: "/work/calpers#discovery",
+    label: "See this in the CalPERS case study",
+  },
+  {
+    marker: "3",
+    text: "a pragmatism about engineering constraints",
+    href: "/work/veeva-systems#constraints",
+    label: "See this in the AI Document Search case study",
+  },
 ];
 
 type CaseStudy = {
@@ -111,6 +135,25 @@ const CASE_STUDIES: CaseStudy[] = [
     tags: ["Content Strategy", "SDLC"],
   },
 ];
+
+/* ==========================================================================
+   FOOTNOTE MARKER
+
+   The small superscript number. Clickable, and padded out to a real
+   tap target without changing how it looks.
+   ========================================================================== */
+
+function FootnoteMarker({ note }: { note: Footnote }) {
+  return (
+    <Link
+      href={note.href}
+      aria-label={note.label}
+      className={`-mx-1 -my-0.5 shrink-0 self-start rounded-sm px-1 py-0.5 text-[11px] leading-[1.9] tabular-nums ${link} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]`}
+    >
+      <sup className="top-0 align-super">{note.marker}</sup>
+    </Link>
+  );
+}
 
 /* ==========================================================================
    CASE STUDY CARD
@@ -249,26 +292,24 @@ export default function Page() {
         </header>
 
         {/* ---- Section 2: about ------------------------------------- */}
-        <section className="mt-6 flex flex-col gap-3">
+        <section className="mt-4 flex flex-col gap-3">
           <p className={type.body}>
             4 years of experience and a Design B.A. from UC Davis. My work
             experience and education have shaped my design thinking with:
           </p>
 
           <ul className="flex flex-col gap-1">
-            {FOOTNOTES.map((note) => (
-              <li key={note.marker} className={`${type.body} flex gap-2`}>
-                <span aria-hidden className="text-neutral-600">
-                  {note.marker}
-                </span>
-                <span>{note.text}</span>
-              </li>
-            ))}
-          </ul>
+  {FOOTNOTES.map((note) => (
+    <li key={note.marker} className={`${type.body} flex gap-2`}>
+      <FootnoteMarker note={note} />
+      <span>{note.text}</span>
+    </li>
+  ))}
+</ul>
         </section>
 
         {/* ---- Section 3: featured work ----------------------------- */}
-        <section className="mt-8" aria-labelledby="work">
+        <section className="mt-5" aria-labelledby="work">
           <h2 id="work" className={type.section}>
             Featured Work Experience
           </h2>
