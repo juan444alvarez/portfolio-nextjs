@@ -112,6 +112,9 @@ type CaseStudy = {
   image: string;
   imageAlt: string;
   tags: string[];
+  /** Optional. Set this and the project points at the live site instead of
+      a /work/<slug> page. Leave it off for normal case studies. */
+  externalUrl?: string;
 };
 
 const CASE_STUDIES: CaseStudy[] = [
@@ -123,6 +126,7 @@ const CASE_STUDIES: CaseStudy[] = [
     image: "/ebara-preview.png",
     imageAlt: "Ebara website navigation redesign",
     tags: ["End to end research", "Usability testing"],
+    externalUrl: "https://www.ebaratech.com/",
   },
   {
     slug: "calpers",
@@ -144,6 +148,27 @@ const CASE_STUDIES: CaseStudy[] = [
 ];
 
 /* ==========================================================================
+   LINK TARGETS
+
+   One function decides where a project points, so the footnote superscript
+   and the card can never drift apart. A project with an externalUrl goes to
+   the live site; everything else goes to its own /work/<slug> page.
+   ========================================================================== */
+
+function hrefFor(slug: string) {
+  const study = CASE_STUDIES.find((s) => s.slug === slug);
+  return study?.externalUrl ?? `/work/${slug}`;
+}
+
+/* External links open in a new tab and need rel="noopener noreferrer";
+   internal ones must not have either. */
+function linkTargetProps(href: string) {
+  return href.startsWith("http")
+    ? { target: "_blank", rel: "noopener noreferrer" }
+    : {};
+}
+
+/* ==========================================================================
    FOOTNOTE MARKER
 
    The small superscript number. Clickable, and padded out to a real tap
@@ -162,9 +187,12 @@ function FootnoteMarker({
   onActivate: () => void;
   onDeactivate: () => void;
 }) {
+  const href = hrefFor(note.slug);
+
   return (
     <Link
-      href={`/work/${note.slug}`}
+      href={href}
+      {...linkTargetProps(href)}
       aria-label={note.label}
       onMouseEnter={onActivate}
       onMouseLeave={onDeactivate}
@@ -188,7 +216,7 @@ function FootnoteMarker({
    frame with object-cover, so it crops rather than distorting.
 
    `group` on the article means hovering anywhere in the card — image
-   included — drives the title color, the arrow, and the image zoom.
+   included — drives the title color, the arrow, and the image shadow.
 
    `isActive` does the same three things from the outside, so hovering the
    matching footnote superscript produces an identical response.
@@ -201,29 +229,31 @@ function CaseStudyCard({
   study: CaseStudy;
   isActive: boolean;
 }) {
-  const href = `/work/${study.slug}`;
+  const href = hrefFor(study.slug);
+  const targetProps = linkTargetProps(href);
+  const isExternal = Boolean(targetProps.target);
 
   return (
     <article className="group flex items-stretch gap-5">
       {/* Image frame — fixed width, height inherited from the row.
           min-h-24 stops it collapsing if the content is ever very short.
-          overflow-hidden is what clips the zoom below. */}
+          The shadow lifts one step on hover; the picture itself doesn't
+          move or change tone. */}
       <Link
         href={href}
+        {...targetProps}
         tabIndex={-1}
         aria-hidden
-        className="relative min-h-24 w-40 shrink-0 cursor-pointer overflow-hidden rounded-sm bg-neutral-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]"
+        className={`relative min-h-24 w-40 shrink-0 cursor-pointer overflow-hidden rounded-sm bg-neutral-200 transition-shadow duration-200 ease-out group-hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA] ${
+          isActive ? "shadow-sm" : "shadow-xs"
+        }`}
       >
-        {/* Slow, small zoom — the frame stays put, the picture grows inside
-            it. Slower than the arrow so it reads as background motion. */}
         <Image
           src={study.image}
           alt={study.imageAlt}
           fill
           sizes="160px"
-          className={`object-cover transition-transform duration-500 ease-out group-hover:scale-105 ${
-            isActive ? "scale-105" : "scale-100"
-          }`}
+          className="object-cover"
         />
       </Link>
 
@@ -232,15 +262,23 @@ function CaseStudyCard({
         <h3>
           <Link
             href={href}
+            {...targetProps}
             className={`inline-flex cursor-pointer items-center gap-1.5 text-[16px] font-medium text-balance ${link} group-hover:text-[#3730A3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA] ${
               isActive ? "text-[#3730A3]" : ""
             }`}
           >
             {study.company}
 
-            {/* Diagonal arrow, pointing to the top-right corner. Rests low
-                and left, then slides up and out along its own 45° axis.
-                Always in the DOM so nothing reflows when it appears. */}
+            {/* Screen readers get a warning the tab is about to change;
+                sighted users get the boxed icon below. */}
+            {isExternal && <span className="sr-only">(opens in a new tab)</span>}
+
+            {/* Two glyphs, same slot. External projects get the boxed
+                arrow-out-of-a-window mark, which conventionally means "this
+                leaves the site". Internal ones keep the plain diagonal.
+
+                Both rest low and left, then slide up and out along their own
+                45° axis. Always in the DOM so nothing reflows. */}
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -255,7 +293,14 @@ function CaseStudyCard({
                   : "-translate-x-1 translate-y-1 opacity-0"
               }`}
             >
-              <path d="M7 17 17 7M8 7h9v9" />
+              {isExternal ? (
+                <>
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <path d="M15 3h6v6M10 14 21 3" />
+                </>
+              ) : (
+                <path d="M7 17 17 7M8 7h9v9" />
+              )}
             </svg>
           </Link>
         </h3>
