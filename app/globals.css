@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3f2f2;
+}
+
+body {
+  background: var(--background);
+}
+
+/* ==========================================================================
+   PAGE TRANSITIONS  —  append this block to src/app/globals.css
+   ==========================================================================
+
+   The outgoing page slides up and dims. The incoming page slides up from
+   below while a clip-path opens from its bottom edge — the mask travels
+   faster than the page, so it reads as a wipe rather than a slide.
+
+   ::view-transition-old(.page-exit) uses CLASS syntax (the leading dot).
+   That matches the enter/exit props on <ViewTransition> in template.tsx,
+   which assign a view-transition-class rather than a name. A bare
+   `page-exit` with no dot would target a view-transition-NAME and silently
+   never match.
+   ========================================================================== */
+
+:root {
+  /* The reference runs 1000ms. That's an agency-site number — dramatic, and
+     fine when a visitor sees it twice. A portfolio gets clicked through, so
+     this is dialled back. Change the one value to taste. */
+  --page-transition-duration: 700ms;
+  --page-transition-ease: cubic-bezier(0.75, 0, 0.1, 1);
+
+  /* The surface revealed under the wipe. This is where the reference's
+     black came from — not from any rule, but from `body { background }`
+     propagating to the viewport canvas, which paints behind the whole
+     transition overlay. Colouring the overlay instead keeps the page
+     itself #ededed at rest. */
+  --page-transition-backdrop: #4338ca;
+}
+
+/* While a transition runs, the snapshot overlay sits on top of the live page
+   and swallows clicks. Letting pointer events through means a fast visitor
+   isn't clicking into a void for most of a second.
+
+   The background is the backdrop: this pseudo-element is the root of the
+   transition overlay and fills the viewport, so it paints behind both
+   snapshots and exists only for the duration of the transition. The
+   outgoing page fades to 0.25, so the blue bleeds through it as it rises. */
+::view-transition {
+  pointer-events: none;
+  background-color: var(--page-transition-backdrop);
+}
+
+::view-transition-old(.page-exit) {
+  animation: var(--page-transition-duration) var(--page-transition-ease) both
+    page-out;
+}
+
+::view-transition-new(.page-enter) {
+  animation: var(--page-transition-duration) var(--page-transition-ease) both
+    page-in;
+}
+
+@keyframes page-out {
+  from {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-25%);
+    opacity: 0.25;
+  }
+}
+
+@keyframes page-in {
+  from {
+    transform: translateY(25%);
+    clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+  }
+  to {
+    transform: translateY(0%);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+/* A full-viewport vertical wipe is the single most common motion-sickness
+   trigger. Collapse it to an instant swap — the browser's own default —
+   for anyone who has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+  }
+}
