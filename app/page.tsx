@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -34,6 +36,10 @@ const pill =
 
 /* ==========================================================================
    DATA
+
+   One slug per project, used in three places: the card, the footnote that
+   points at it, and the URL. Everything links to /work/<slug> — footnote
+   and card go to exactly the same page.
    ========================================================================== */
 
 type Social = { label: string; href: string; icon: ReactNode };
@@ -72,7 +78,8 @@ const SOCIALS: Social[] = [
 type Footnote = {
   marker: string;
   text: string;
-  href: string;
+  /** Must match a CASE_STUDIES slug — pairs the two, and builds the URL. */
+  slug: string;
   /** Screen-reader name for the marker link — "1" alone is useless. */
   label: string;
 };
@@ -81,19 +88,19 @@ const FOOTNOTES: Footnote[] = [
   {
     marker: "1",
     text: "the agency to build ideas",
-    href: "/work/ebara#approach",
+    slug: "ebara",
     label: "See this in the Ebara Website Redesign case study",
   },
   {
     marker: "2",
     text: "a habit of continuous discovery for business needs",
-    href: "/work/calpers#discovery",
+    slug: "calpers",
     label: "See this in the CalPERS case study",
   },
   {
     marker: "3",
     text: "a pragmatism about engineering constraints",
-    href: "/work/veeva-systems#constraints",
+    slug: "veeva-systems",
     label: "See this in the AI Document Search case study",
   },
 ];
@@ -139,16 +146,31 @@ const CASE_STUDIES: CaseStudy[] = [
 /* ==========================================================================
    FOOTNOTE MARKER
 
-   The small superscript number. Clickable, and padded out to a real
-   tap target without changing how it looks.
+   The small superscript number. Clickable, and padded out to a real tap
+   target without changing how it looks.
+
+   Hovering or focusing it reports its slug upward, which is how the
+   matching case study card lights up further down the page.
    ========================================================================== */
 
-function FootnoteMarker({ note }: { note: Footnote }) {
+function FootnoteMarker({
+  note,
+  onActivate,
+  onDeactivate,
+}: {
+  note: Footnote;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}) {
   return (
     <Link
-      href={note.href}
+      href={`/work/${note.slug}`}
       aria-label={note.label}
-      className={`-mx-1 -my-0.5 shrink-0 self-start rounded-sm px-1 py-0.5 text-[11px] leading-[1.9] tabular-nums ${link} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]`}
+      onMouseEnter={onActivate}
+      onMouseLeave={onDeactivate}
+      onFocus={onActivate}
+      onBlur={onDeactivate}
+      className={`peer -mx-1 -my-0.5 shrink-0 self-start rounded-sm px-1 py-0.5 text-[11px] leading-[1.9] tabular-nums ${link} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]`}
     >
       <sup className="top-0 align-super">{note.marker}</sup>
     </Link>
@@ -165,30 +187,43 @@ function FootnoteMarker({ note }: { note: Footnote }) {
    own text, and the image frame stretches to match it. The image fills that
    frame with object-cover, so it crops rather than distorting.
 
-   Two separate links — the image frame and the title — both to the same
-   place. `peer` on the image lets the title react when the image is
-   hovered, so the pair reads as one target.
+   `group` on the article means hovering anywhere in the card — image
+   included — drives the title color, the arrow, and the image zoom.
+
+   `isActive` does the same three things from the outside, so hovering the
+   matching footnote superscript produces an identical response.
    ========================================================================== */
 
-function CaseStudyCard({ study }: { study: CaseStudy }) {
+function CaseStudyCard({
+  study,
+  isActive,
+}: {
+  study: CaseStudy;
+  isActive: boolean;
+}) {
   const href = `/work/${study.slug}`;
 
   return (
-    <article className="flex items-stretch gap-5">
+    <article className="group flex items-stretch gap-5">
       {/* Image frame — fixed width, height inherited from the row.
-          min-h-24 stops it collapsing if the content is ever very short. */}
+          min-h-24 stops it collapsing if the content is ever very short.
+          overflow-hidden is what clips the zoom below. */}
       <Link
         href={href}
         tabIndex={-1}
         aria-hidden
-        className="peer relative min-h-24 w-40 shrink-0 cursor-pointer overflow-hidden rounded-sm bg-neutral-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]"
+        className="relative min-h-24 w-40 shrink-0 cursor-pointer overflow-hidden rounded-sm bg-neutral-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]"
       >
+        {/* Slow, small zoom — the frame stays put, the picture grows inside
+            it. Slower than the arrow so it reads as background motion. */}
         <Image
           src={study.image}
           alt={study.imageAlt}
           fill
           sizes="160px"
-          className="object-cover"
+          className={`object-cover transition-transform duration-500 ease-out group-hover:scale-105 ${
+            isActive ? "scale-105" : "scale-100"
+          }`}
         />
       </Link>
 
@@ -197,12 +232,15 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
         <h3>
           <Link
             href={href}
-            className={`group inline-flex cursor-pointer items-center gap-1.5 text-[16px] font-medium text-balance ${link} peer-hover:text-[#3730A3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]`}
+            className={`inline-flex cursor-pointer items-center gap-1.5 text-[16px] font-medium text-balance ${link} group-hover:text-[#3730A3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA] ${
+              isActive ? "text-[#3730A3]" : ""
+            }`}
           >
             {study.company}
 
-            {/* Fades in rising from below. Always in the DOM so nothing
-                reflows when it appears. */}
+            {/* Diagonal arrow, pointing to the top-right corner. Rests low
+                and left, then slides up and out along its own 45° axis.
+                Always in the DOM so nothing reflows when it appears. */}
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -211,14 +249,13 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden
-              className="
-                h-3.5 w-3.5 shrink-0 translate-y-1 opacity-0
-                transition-all duration-200 ease-out
-                group-hover:translate-y-0 group-hover:opacity-100
-                group-focus-visible:translate-y-0 group-focus-visible:opacity-100
-              "
+              className={`h-3.5 w-3.5 shrink-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 ${
+                isActive
+                  ? "translate-x-0 translate-y-0 opacity-100"
+                  : "-translate-x-1 translate-y-1 opacity-0"
+              }`}
             >
-              <path d="M5 12h14M13 6l6 6-6 6" />
+              <path d="M7 17 17 7M8 7h9v9" />
             </svg>
           </Link>
         </h3>
@@ -244,6 +281,10 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
    ========================================================================== */
 
 export default function Page() {
+  /* Which case study is currently being pointed at from the footnote list.
+     null means none. */
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+
   return (
     <main className="grid min-h-dvh place-items-center px-6 py-16 antialiased">
       {/* Squished column: 480px holds the measure around 55-60 characters. */}
@@ -299,13 +340,17 @@ export default function Page() {
           </p>
 
           <ul className="flex flex-col gap-1">
-  {FOOTNOTES.map((note) => (
-    <li key={note.marker} className={`${type.body} flex gap-2`}>
-      <FootnoteMarker note={note} />
-      <span>{note.text}</span>
-    </li>
-  ))}
-</ul>
+            {FOOTNOTES.map((note) => (
+              <li key={note.marker} className={`${type.body} flex gap-2`}>
+                <FootnoteMarker
+                  note={note}
+                  onActivate={() => setActiveSlug(note.slug)}
+                  onDeactivate={() => setActiveSlug(null)}
+                />
+                <span>{note.text}</span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* ---- Section 3: featured work ----------------------------- */}
@@ -317,7 +362,10 @@ export default function Page() {
           <ul className="mt-5 flex flex-col gap-7">
             {CASE_STUDIES.map((study) => (
               <li key={study.slug}>
-                <CaseStudyCard study={study} />
+                <CaseStudyCard
+                  study={study}
+                  isActive={activeSlug === study.slug}
+                />
               </li>
             ))}
           </ul>
