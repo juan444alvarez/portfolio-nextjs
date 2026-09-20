@@ -1,54 +1,99 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f3f2f2;
-}
-
-body {
-  background: var(--background);
-}
-
 /* ==========================================================================
-   PAGE TRANSITIONS  —  append this block to src/app/globals.css
-   ==========================================================================
-
-   The outgoing page slides up and dims. The incoming page slides up from
-   below while a clip-path opens from its bottom edge — the mask travels
-   faster than the page, so it reads as a wipe rather than a slide.
-
-   ::view-transition-old(.page-exit) uses CLASS syntax (the leading dot).
-   That matches the enter/exit props on <ViewTransition> in template.tsx,
-   which assign a view-transition-class rather than a name. A bare
-   `page-exit` with no dot would target a view-transition-NAME and silently
-   never match.
+   TOKENS
    ========================================================================== */
 
 :root {
-  /* The reference runs 1000ms. That's an agency-site number — dramatic, and
-     fine when a visitor sees it twice. A portfolio gets clicked through, so
-     this is dialled back. Change the one value to taste. */
-  --page-transition-duration: 700ms;
-  --page-transition-ease: cubic-bezier(0.75, 0, 0.1, 1);
+  /* The page surface. NOT painted by body — see below. Each page paints it
+     on its own <main> via the bg-background utility that @theme generates
+     from this variable. */
+  --background: #ededed;
 
-  /* The surface revealed under the wipe. This is where the reference's
-     black came from — not from any rule, but from `body { background }`
-     propagating to the viewport canvas, which paints behind the whole
-     transition overlay. Colouring the overlay instead keeps the page
-     itself #ededed at rest. */
-  --page-transition-backdrop: #4338ca;
+  /* The link blue, mirrored from page.tsx. Tailwind can't read this
+     variable — page.tsx has #4338CA written out literally in its class
+     strings — so if you change the blue, change it in BOTH places. */
+  --accent: #4338ca;
 }
 
-/* While a transition runs, the snapshot overlay sits on top of the live page
-   and swallows clicks. Letting pointer events through means a fast visitor
-   isn't clicking into a void for most of a second.
+/* Tailwind CSS v4 directive; standard CSS linters do not recognize it. */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@theme inline {
+  --color-background: var(--background);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
 
-   The background is the backdrop: this pseudo-element is the root of the
-   transition overlay and fills the viewport, so it paints behind both
-   snapshots and exists only for the duration of the transition. The
-   outgoing page fades to 0.25, so the blue bleeds through it as it rises. */
+/* BLACK ON PURPOSE — this is what gives the transition depth.
+
+   body propagates to the viewport canvas, which paints behind everything.
+   During the transition the outgoing page scales to 0.9 and fades to 0.5,
+   and THIS is what shows through and around it. Without it the page pulls
+   back over more of itself and the motion reads flat.
+
+   Because body no longer paints the page surface, every page's <main> must
+   carry bg-background and min-h-dvh. Any page that forgets will render
+   black. The one place black still shows at rest is the iOS/macOS
+   overscroll bounce — accepted trade for the depth. */
+body {
+  background: #000000;
+}
+
+/* ==========================================================================
+   PAGE TRANSITION  —  home → case study only
+
+   The tutorial's animation, ported off next-view-transitions.
+
+   It ran the motion imperatively with documentElement.animate() and a
+   pseudoElement option, because back then there was no way to say "animate
+   THIS navigation and not that one" from CSS. There is now: the link tags
+   the navigation with a transition type, the <ViewTransition> wrappers in
+   page.tsx map that type to a class, and the rules below style the class.
+
+   Same numbers as the tutorial:
+     old →  opacity 1 → 0.5,  scale 1 → 0.9,  translateY 0 → -100px
+     new →  translateY 100% → 0
+     both   1000ms  cubic-bezier(0.76, 0, 0.24, 1)  fill forwards
+
+   WHY BACK IS INSTANT: browser back carries no transition type, so both
+   wrappers fall to their `default: "none"` and neither class below is ever
+   applied. Nothing here runs. You don't switch it off — it never turns on.
+
+   CLASS SYNTAX, NOT NAME SYNTAX: the leading dot matters. The enter/exit
+   props assign a view-transition-CLASS. Without the dot these selectors
+   target a view-transition-NAME, match nothing, and you get an instant swap
+   with no error to tell you why.
+   ========================================================================== */
+
+:root {
+  /* The tutorial ran 1000ms — an agency-site number, designed to be seen
+     once. A portfolio gets clicked through, so this is dialled back.
+
+     The easing does NOT need adjusting to match. cubic-bezier is normalized:
+     its four numbers describe a curve on a 0→1 grid, and the duration is
+     what stretches that grid onto real time. The same curve, compressed. */
+  --page-transition-duration: 700ms;
+  --page-transition-ease: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* The overlay sits on top of the live page for the full second and swallows
+   clicks. Without this, a visitor clicking at 400ms is clicking into a void.
+
+   No background-color here any more — body's black is the backdrop now, and
+   painting it twice only makes the two harder to reason about. */
 ::view-transition {
   pointer-events: none;
-  background-color: var(--page-transition-backdrop);
+}
+
+/* The incoming page has to paint over the outgoing one — it slides up from
+   below and covers it. These are two separate groups (two different
+   elements), so their paint order isn't guaranteed without this. */
+::view-transition-group(.page-exit) {
+  z-index: 1;
+}
+
+::view-transition-group(.page-enter) {
+  z-index: 2;
 }
 
 ::view-transition-old(.page-exit) {
@@ -61,36 +106,37 @@ body {
     page-in;
 }
 
+/* scale and translateY are one `transform` here. The tutorial passed them as
+   separate WAAPI keys (`scale` is its own CSS property), which composes the
+   same way visually. */
 @keyframes page-out {
   from {
-    transform: translateY(0%);
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
   to {
-    transform: translateY(-25%);
-    opacity: 0.25;
+    opacity: 0.5;
+    transform: translateY(-100px) scale(0.9);
   }
 }
 
 @keyframes page-in {
   from {
-    transform: translateY(25%);
-    clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+    transform: translateY(100%);
   }
   to {
-    transform: translateY(0%);
-    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    transform: translateY(0);
   }
 }
 
-/* A full-viewport vertical wipe is the single most common motion-sickness
-   trigger. Collapse it to an instant swap — the browser's own default —
-   for anyone who has asked for less motion. */
+/* A full-viewport vertical slide is the most common motion-sickness trigger.
+   Collapse it to the browser's default instant swap for anyone who's asked
+   for less motion. */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-group(*) {
-    animation-duration: 1ms !important;
+    animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
 }
