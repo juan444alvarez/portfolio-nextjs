@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CaseStudyTransition } from "@/components/PageTransition";
-import { link, type } from "@/components/tokens";
+import { ArrowLeft, ExternalLink } from "@/components/icons";
+import { link, linkText, type } from "@/components/tokens";
 
 /* ==========================================================================
    CASE STUDY — Ebara
@@ -17,9 +18,9 @@ import { link, type } from "@/components/tokens";
        wipe is a full-page slide, not a shared element, so there's no edge
        the eye tracks across the cut.
 
-   bg-background on <main> is NOT optional. body is black now (that's what
-   gives the transition its depth), so any page whose main forgets this
-   renders black.
+   bg-background on <main> is NOT optional. body is black (that's what gives
+   the transition its depth), so any page whose main forgets this renders
+   black.
    ========================================================================== */
 
 export default function Page() {
@@ -27,41 +28,50 @@ export default function Page() {
     <CaseStudyTransition>
       <main className="min-h-dvh bg-background px-6 py-16 antialiased">
         <div className="mx-auto w-full max-w-120">
-          {/* Not in your mock — browser back already works, and it's
-              deliberately untagged so the return stays instant. Delete this
-              block if you want the mock exactly. */}
-          <Link
-            href="/"
-            className={`group inline-flex items-center gap-1.5 text-[13px] leading-none ${link} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]`}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-              className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 ease-out group-hover:-translate-x-0.5"
-            >
-              <path d="M19 12H5M11 18l-6-6 6-6" />
-            </svg>
-            Back
+          {/* Back link. Deliberately untagged — no transitionTypes — so the
+              return trip stays instant, same as the browser back button.
+
+              The arrow is always present and never moves; hover is the
+              underline and the shade, nothing else. Laid out as inline text
+              rather than inline-flex so the underline runs under the arrow
+              too — on a flex box the line would draw at the bottom of the
+              box instead of along the text baseline. */}
+          <Link href="/" className={`${link} text-sm font-medium`}>
+            <ArrowLeft className="mr-1" />
+            <span className={linkText}>Back</span>
           </Link>
 
           {/* ---- Title ------------------------------------------------ */}
-          {/* Same token as the name on home, so the two pages open at the
-              same typographic weight. text-balance keeps the two lines
-              even rather than leaving one orphan word. */}
-          <h1 className={`mt-8 text-balance ${type.name}`}>
+          {/* showcaseTitle shares everything with the homepage's h1 except
+              its size — same weight, leading, color and balance, two points
+              larger because it's carrying the whole page. */}
+          <h1 className={`mt-2 ${type.showcaseName}`}>
             Untangling information architecture through end-to-end UX research
           </h1>
+
+          {/* ---- Note ------------------------------------------------- */}
+          <p className={`mt-3 ${type.body}`}>
+            Live product navigation flow at:{" "}
+            {/* External mark always present, inside the <a> so the underline
+                runs under it on hover like any other link text. */}
+            <a
+              href="https://ebaratechnologies.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={link}
+            >
+              <span className={linkText}>ebaratechnologies.com</span>
+              <span className="sr-only"> (opens in a new tab)</span>
+              <ExternalLink className="ml-1" />
+            </a>
+          </p>
 
           {/* ---- Hero ------------------------------------------------- */}
           {/* Fixed aspect + object-cover so a differently-proportioned file
               crops instead of pushing the text around. bg-neutral-200 holds
-              the space while it loads. */}
-          <div className="relative mt-6 aspect-2/1 w-full overflow-hidden rounded-sm bg-neutral-200">
+              the space while it loads. priority stays: this is the LCP
+              element for anyone landing here directly. */}
+          <div className="relative mt-4 aspect-2/1 w-full overflow-hidden rounded-sm bg-neutral-200">
             <Image
               src="/ebara-preview.png"
               alt="Grid of Ebara product pages showing the redesigned navigation"
@@ -72,25 +82,9 @@ export default function Page() {
             />
           </div>
 
-          {/* ---- Note ------------------------------------------------- */}
-          <p className={`mt-5 ${type.note}`}>
-            *I left before the budget was approved for a website redesign,
-            however many of my designs were implemented after. Check out my
-            product navigation flow at:{" "}
-            <a
-              href="https://ebaratechnologies.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${link} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]`}
-            >
-              ebaratechnologies.com
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </p>
-
           {/* ---- Problem ---------------------------------------------- */}
-          <section className="mt-8" aria-labelledby="problem">
-            <h2 id="problem" className={type.section}>
+          <section className="mt-6" aria-labelledby="problem">
+            <h2 id="problem" className={type.name}>
               Problem
             </h2>
             <p className={`mt-3 ${type.body}`}>
