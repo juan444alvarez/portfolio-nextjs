@@ -8,7 +8,7 @@
   /* The page surface. NOT painted by body — see below. Each page paints it
      on its own <main> via the bg-background utility that @theme generates
      from this variable. */
-  --background: #ededed;
+  --background: #f0f0f0;
 
   /* The link blue, mirrored from page.tsx. Tailwind can't read this
      variable — page.tsx has #4338CA written out literally in its class
