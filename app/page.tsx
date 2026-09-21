@@ -197,7 +197,7 @@ export default function Page() {
           </header>
 
           {/* ---- Section 2: about ------------------------------------- */}
-          <section className="mt-4 flex flex-col gap-3">
+          <section className="mt-3.5 flex flex-col gap-3">
             <p className={type.body}>
               Four years of work experience and a Design B.A. from UC Davis have
               shaped my design thinking with:
