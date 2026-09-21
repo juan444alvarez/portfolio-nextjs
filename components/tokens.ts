@@ -77,5 +77,5 @@ export const type = {
   name: "text-lg font-semibold leading-tight text-neutral-700 tracking-tight",
   showcaseName:
     "text-xl font-semibold leading-tight text-neutral-700 tracking-tight max-w-[28ch]",
-  subtext: "text-sm leading-normal text-neutral-900/70",
+  subtext: "text-sm leading-normal text-neutral-900/80",
 } as const;
