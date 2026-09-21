@@ -1,19 +1,29 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   TOKENS
+   DESIGN TOKENS  —  the only place colours are defined
+
+   Every colour below becomes a Tailwind utility through @theme, so nothing
+   in a .tsx file ever writes a hex. That matters more than it sounds: an
+   arbitrary value like text-[#1F4E8C] only works if the complete string is
+   written out literally in a source file, because Tailwind scans text and
+   never runs your JS. Utilities generated from these variables have no such
+   trap — change the hex here and every link follows.
    ========================================================================== */
 
 :root {
-  /* The page surface. NOT painted by body — see below. Each page paints it
-     on its own <main> via the bg-background utility that @theme generates
-     from this variable. */
+  /* The page surface. NOT painted by body — see the note further down. Each
+     page gets it from <Shell>, via the bg-background utility. */
   --background: #f0f0f0;
 
-  /* The link blue, mirrored from page.tsx. Tailwind can't read this
-     variable — page.tsx has #4338CA written out literally in its class
-     strings — so if you change the blue, change it in BOTH places. */
-  --accent: #4338ca;
+  /* The link blue. Steel navy — navy-leaning and desaturated rather than the
+     violet-cast indigo this used to be.
+
+     Contrast on --background is 7.29:1. That clears WCAG AA for normal text
+     (4.5:1) and AAA (7:1), so it holds up at 16px body size, not just for
+     large text. If you ever change this, re-check it against #f0f0f0 — the
+     surface is light, so a lighter blue loses contrast fast. */
+  --accent: #1f4e8c;
 }
 
 /* Tailwind CSS v4 directive; standard CSS linters do not recognize it. */
@@ -21,43 +31,210 @@
 @theme inline {
   --color-background: var(--background);
   --color-accent: var(--accent);
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* --font-geist-sans is set by next/font in layout.tsx. The variable is
+     named differently from --font-sans on purpose: this used to read
+     `--font-sans: var(--font-sans), …`, which referenced itself. It worked
+     only because layout also applied the font's own class. Two names, no
+     ambiguity. */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* BLACK ON PURPOSE — this is what gives the transition depth.
+/* BLACK ON PURPOSE — this is what gives the page transition its depth.
 
    body propagates to the viewport canvas, which paints behind everything.
    During the transition the outgoing page scales to 0.9 and fades to 0.5,
    and THIS is what shows through and around it. Without it the page pulls
    back over more of itself and the motion reads flat.
 
-   Because body no longer paints the page surface, every page's <main> must
-   carry bg-background and min-h-dvh. Any page that forgets will render
-   black. The one place black still shows at rest is the iOS/macOS
-   overscroll bounce — accepted trade for the depth. */
+   Because body no longer paints the page surface, every page needs
+   bg-background and min-h-dvh. That used to be a rule you had to remember
+   per page, and CalPERS forgot it. It is now owned by <Shell>, which is the
+   only thing that renders <main> — so there is nothing left to forget.
+
+   The one place black still shows at rest is the iOS/macOS overscroll
+   bounce. Accepted trade for the depth. */
 body {
   background: #000000;
 }
 
 /* ==========================================================================
+   LIVE SITE PILL  →  used by components/LiveSitePill.tsx
+
+   The one component whose look lives in CSS rather than in Tailwind
+   utilities. Its reasons are in that file's header; the short version is
+   four stacked shadows across three states, plus @keyframes, which
+   utilities can't express at all.
+
+   THE SKEUOMORPHISM IS THREE DECISIONS, and they're worth naming because
+   removing any one of them flattens it:
+
+     1. An inset white line along the TOP edge — light landing on a surface
+        that faces up.
+     2. A border whose BOTTOM is a shade darker than its top — the far edge
+        turning away from that light.
+     3. An outer shadow implying the pill floats a couple of pixels off the
+        page, which on :active is swapped for an INSET shadow. Light stops
+        falling under it and starts falling into it. That swap, plus half a
+        pixel of downward movement, is the entire press.
+
+   Tune the numbers here. Colours are hoisted so you don't have to hunt.
+   ========================================================================== */
+
+:root {
+  --pill-ink: #26272b;
+  --pill-face-top: #ffffff;
+  --pill-face-bottom: #f6f6f7;
+  --pill-edge: #e2e2e5;
+  --pill-edge-bottom: #d2d2d7;
+
+  /* The status light. Three greens: a bright core, a mid body, and a dark
+     rim — that spread is what makes a 7px dot read as a lit lens instead of
+     a flat circle. */
+  --led-core: #7ff0a6;
+  --led-body: #34d47d;
+  --led-deep: #12a552;
+  --led-glow: rgb(22 163 74 / 0.55);
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  /* Tighter on the left: the light is a smaller shape than the text cap
+     height, so equal padding would look left-heavy. */
+  padding: 7px 13px 7px 11px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  color: var(--pill-ink);
+  text-decoration: none;
+  white-space: nowrap;
+
+  /* Stops a flex or grid parent from stretching the pill to full width.
+     Ignored in normal flow, so it costs nothing where it isn't needed. */
+  align-self: flex-start;
+  width: fit-content;
+
+  background: linear-gradient(var(--pill-face-top), var(--pill-face-bottom));
+  border: 1px solid var(--pill-edge);
+  border-bottom-color: var(--pill-edge-bottom);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 1px 1.5px rgb(16 17 20 / 0.05),
+    0 3px 8px -3px rgb(16 17 20 / 0.12);
+
+  transition:
+    box-shadow 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 60ms ease;
+}
+
+/* The glyph is a hint, not a second focal point. Inherits currentColor, so
+   never set a colour on the SVG itself. */
+.live-pill svg {
+  opacity: 0.55;
+}
+
+.live-pill:hover {
+  background: linear-gradient(#ffffff, #fafafb);
+  border-color: #d8d8dd;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 1px 2px rgb(16 17 20 / 0.06),
+    0 6px 14px -4px rgb(16 17 20 / 0.16);
+}
+
+/* The press: outer shadow out, inset shadow in, half a pixel down. */
+.live-pill:active {
+  transform: translateY(0.5px);
+  background: linear-gradient(#f6f6f7, #f1f1f3);
+  box-shadow: inset 0 1px 2px rgb(16 17 20 / 0.09);
+}
+
+.live-pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- The status light -------------------------------------------------- */
+
+.live-pill__led {
+  position: relative;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  /* The highlight is deliberately OFF-centre at 34%/30%. A centred
+     highlight reads as a flat disc; an off-centre one reads as a dome
+     catching light from the upper left, matching the pill's own lighting. */
+  background: radial-gradient(
+    circle at 34% 30%,
+    var(--led-core) 0%,
+    var(--led-body) 42%,
+    var(--led-deep) 100%
+  );
+  box-shadow:
+    0 0 0 0.5px rgb(6 95 44 / 0.35),
+    0 0 5px 0.5px var(--led-glow),
+    inset 0 -0.5px 1px rgb(4 80 38 / 0.45);
+}
+
+/* THE PULSE IS A SEPARATE RING, NOT A BLINK. The dot's own opacity never
+   changes, so it stays legible; a 1px ring breathes outward from it. A hard
+   on/off blink on a status light reads as an error rather than as "live",
+   and flashing is the thing screen-sensitivity guidance actually cares
+   about. At one cycle per 2s on a 7px target this is nowhere near any
+   flashing threshold. */
+.live-pill__led::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgb(20 160 74 / 0.55);
+  animation: live-pill-halo 2s ease-out infinite;
+}
+
+@keyframes live-pill-halo {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.85;
+  }
+  70%,
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+/* Anyone who asked for less motion gets a lit dot and no pulse. The dot is
+   the information; the pulse is emphasis. */
+@media (prefers-reduced-motion: reduce) {
+  .live-pill__led::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
    PAGE TRANSITION  —  home → case study only
 
-   The tutorial's animation, ported off next-view-transitions.
+   The link that starts the navigation tags it with a transition type, the
+   <ViewTransition> wrappers inside <Shell> map that type to a class, and the
+   rules below style the class. Three pieces, and all three have to agree:
 
-   It ran the motion imperatively with documentElement.animate() and a
-   pseudoElement option, because back then there was no way to say "animate
-   THIS navigation and not that one" from CSS. There is now: the link tags
-   the navigation with a transition type, the <ViewTransition> wrappers in
-   page.tsx map that type to a class, and the rules below style the class.
+     Link  transitionTypes={CASE_STUDY_TRANSITION}   ← components/Shell.tsx
+     Shell enter/exit={{ "case-study": "page-…" }}   ← components/Shell.tsx
+     CSS   ::view-transition-old(.page-exit)         ← here
 
-   Same numbers as the tutorial:
-     old →  opacity 1 → 0.5,  scale 1 → 0.9,  translateY 0 → -100px
-     new →  translateY 100% → 0
-     both   1000ms  cubic-bezier(0.76, 0, 0.24, 1)  fill forwards
-
-   WHY BACK IS INSTANT: browser back carries no transition type, so both
-   wrappers fall to their `default: "none"` and neither class below is ever
-   applied. Nothing here runs. You don't switch it off — it never turns on.
+   WHY BACK IS INSTANT: browser back (and swipe back, and refresh) carries no
+   transition type, so both wrappers fall to their `default: "none"` and
+   neither class below is ever applied. Nothing here runs. You don't switch
+   it off — it never turns on.
 
    CLASS SYNTAX, NOT NAME SYNTAX: the leading dot matters. The enter/exit
    props assign a view-transition-CLASS. Without the dot these selectors
@@ -66,21 +243,19 @@ body {
    ========================================================================== */
 
 :root {
-  /* The tutorial ran 1000ms — an agency-site number, designed to be seen
-     once. A portfolio gets clicked through, so this is dialled back.
+  /* The 1000ms this was ported from is an agency-site number, designed to be
+     seen once. A portfolio gets clicked through, so it's dialled back.
 
      The easing does NOT need adjusting to match. cubic-bezier is normalized:
      its four numbers describe a curve on a 0→1 grid, and the duration is
-     what stretches that grid onto real time. The same curve, compressed. */
+     what stretches that grid onto real time. Same curve, compressed. */
   --page-transition-duration: 700ms;
   --page-transition-ease: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* The overlay sits on top of the live page for the full second and swallows
-   clicks. Without this, a visitor clicking at 400ms is clicking into a void.
-
-   No background-color here any more — body's black is the backdrop now, and
-   painting it twice only makes the two harder to reason about. */
+/* The overlay sits on top of the live page for the full duration and would
+   otherwise swallow clicks — a visitor clicking at 400ms would be clicking
+   into a void. */
 ::view-transition {
   pointer-events: none;
 }
@@ -106,9 +281,9 @@ body {
     page-in;
 }
 
-/* scale and translateY are one `transform` here. The tutorial passed them as
-   separate WAAPI keys (`scale` is its own CSS property), which composes the
-   same way visually. */
+/* scale and translateY are one `transform` here rather than two properties,
+   which composes the same way visually and keeps them on one compositor
+   animation. */
 @keyframes page-out {
   from {
     opacity: 1;

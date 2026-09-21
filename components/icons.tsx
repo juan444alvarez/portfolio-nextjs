@@ -3,36 +3,63 @@ import type { ReactNode } from "react";
 /* ==========================================================================
    ICONS
 
-   Four inline SVGs, no dependency. Lucide or Heroicons would be the library
+   Three inline SVGs, no dependency. Lucide or Heroicons would be the library
    answer, but neither ships a LinkedIn mark (brand logos are deliberately
    out of scope for both), so one icon would stay local regardless — and a
-   package is a lot of surface for twelve lines of <path>.
+   package is a lot of surface for nine lines of <path>.
 
-   ALIGNMENT, baked in so no call site has to remember it:
+   ExternalLink left when the homepage lost its external project links, and
+   came back for the live-site pill. That isn't churn — the two cases are
+   different: the homepage links only to its own case studies, while a case
+   study legitimately points at the live site it produced.
 
-     h-3 w-3        12px. Smaller than it looks like it should be. An arrow
-                    is centered in its 24x24 viewBox, so the whole box reads
-                    as the glyph; at 14px it would tower over the text.
+   NONE OF THESE SIT IN A LINE OF TEXT ANY MORE. Every one is a flex child —
+   ArrowLeft inside the back link, the two marks inside the social nav — so
+   the container's items-center does the vertical alignment. That's why there
+   is no vertical-align anywhere below: a flex item is blockified, and
+   vertical-align simply doesn't apply to it. (The long align-[-0.05em]
+   nudge this file used to carry existed for the old inline arrow, and left
+   with it.)
 
-     align-[-0.05em]  Nudges it down ~0.7px. Without any align, an inline
-                    SVG's baseline is its BOTTOM edge, which parks the glyph
-                    a pixel or two above the text's optical centre and reads
-                    as floating. This is the "wonky" you were seeing.
+   Sizes are baked in so no call site has to remember them — and so no call
+   site can set a conflicting h-/w- utility, where the winner would come
+   down to Tailwind's class order rather than intent.
 
-   Why not centre it properly with align-middle: that puts the icon's midpoint
-   at half the x-height, which pushes its bottom ~2.4px below the baseline —
-   straight into the underline, which sits at a fixed 3px and does not move
-   for tall children. Slightly high beats sliced through.
-
-   Colour comes from currentColor, so these inherit the link token's blue and
-   its hover shade for free. Never set a fill or stroke colour here.
+   Colour comes from currentColor, so these inherit the accent blue for free.
+   Never set a fill or stroke colour here.
    ========================================================================== */
 
 type IconProps = { className?: string };
 
-/* ---- Inline icons: sit inside a line of text ---------------------------- */
+/* ---- Back link arrow --------------------------------------------------- */
 
-/** Leads the back link. Pass mr-1 for the gap. */
+/** Leads the back link, as the first flex child. No margin needed — the
+    link's gap-1.5 sets the spacing.
+
+    14px to match the 14px text beside it: an arrow is centered in its 24x24
+    viewBox, so the whole box reads as the glyph. shrink-0 stops flex from
+    squeezing it if the link ever lands in a tight column.
+
+    NO VERTICAL NUDGE, AND THAT'S A MEASURED RESULT rather than a shrug.
+
+    There are two defensible references for centring an icon against text.
+    Against all-lowercase text you align to the x-height centre; against
+    mixed-case text — "Back", with an ascending B — you align to the
+    cap-height centre, halfway between baseline and cap height.
+
+    Geist happens to make the second one free. Its ascender is 1.005em and
+    its cap height plus descender is 0.710 + 0.295 = 1.005em: identical. Work
+    through the line-box arithmetic and those two facts cancel, so with
+    leading-none the middle of the line box lands EXACTLY on the cap-height
+    centre. At text-sm both come out at 7.00px from the top. items-center is
+    already correct, to zero error.
+
+    (An earlier version of this file nudged the arrow down 1px, computed
+    against the x-height centre at 8.26px. That's the right reference for
+    lowercase-only text and the wrong one here. If your eye prefers the lower
+    position anyway, add translate-y-px — and use a transform rather than
+    mt-px, because margin on a flex item counts toward the line height and
+    would drag the hover border down with it.) */
 export function ArrowLeft({ className = "" }: IconProps) {
   return (
     <svg
@@ -43,25 +70,31 @@ export function ArrowLeft({ className = "" }: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      className={`inline-block h-3 w-3 align-[-0.05em] ${className}`}
+      className={`h-3.5 w-3.5 shrink-0 ${className}`}
     >
       <path d="M19 12H5M11 18l-6-6 6-6" />
     </svg>
   );
 }
 
-/** Trails any link leaving the site. Pass ml-1 for the gap. */
+/** Trails the live-site pill's label. Sized 12px against the pill's 13px
+    text, so it reads as a hint rather than competing with the words.
+
+    Same zero-nudge result as ArrowLeft, for the same reason: the pill's
+    label is mixed case, its line-height is 1, and Geist's metrics put the
+    cap-height centre exactly at the middle of the line box. The pill's CSS
+    fades it to 55% opacity — don't set a colour here. */
 export function ExternalLink({ className = "" }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={2.2}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      className={`inline-block h-3 w-3 align-[-0.05em] ${className}`}
+      className={`h-3 w-3 shrink-0 ${className}`}
     >
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
       <path d="M15 3h6v6M10 14 21 3" />
@@ -69,7 +102,7 @@ export function ExternalLink({ className = "" }: IconProps) {
   );
 }
 
-/* ---- Standalone marks: sit in the social nav, not in text --------------- */
+/* ---- Social nav marks -------------------------------------------------- */
 
 /** Brand mark — filled, not stroked, so it can't take strokeWidth. */
 export function LinkedInMark(): ReactNode {
@@ -85,7 +118,7 @@ export function LinkedInMark(): ReactNode {
   );
 }
 
-/** Resume. Lighter stroke than the arrows — it has more internal detail, so
+/** Resume. Lighter stroke than the arrow — it has more internal detail, so
     a 2px stroke at 16px turns the lines into a blob. */
 export function DocumentMark(): ReactNode {
   return (

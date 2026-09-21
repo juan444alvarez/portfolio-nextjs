@@ -1,60 +1,113 @@
 import Link from "next/link";
+import { CaseStudyShell } from "@/components/Shell";
+import { ArrowLeft } from "@/components/icons";
+import { backLink, type } from "@/components/tokens";
+import { caseStudy } from "@/content/case-studies";
+
+/* Images live in this folder, beside this file. Uncomment alongside the
+   <Figure> block further down. Also uncomment the Figure import itself. */
+// import { Figure } from "@/components/Figure";
+// import { LiveSitePill } from "@/components/LiveSitePill";
+// import contentAudit from "./content-audit.png";
+// import releaseFlow from "./release-flow.png";
 
 /* ==========================================================================
-   CASE STUDY TEMPLATE — CalPERS
+   CASE STUDY — CalPERS   →   app/work/calpers/page.tsx   →   /work/calpers
 
-   Lives at: app/work/calpers/page.tsx  →  /work/calpers
+   THIS FILE IS THE TEMPLATE. Copy it for a new case study and change two
+   things: the slug passed to caseStudy(), and the prose in <section>.
 
-   The folder name IS the URL. That folder name must match the slug in
-   CASE_STUDIES on the homepage, or the link 404s.
+   The folder name IS the URL, and it must match the slug in
+   content/case-studies.ts. caseStudy() only accepts a slug that exists in
+   that file, so a mismatch is now a type error here rather than a 404 on
+   click.
 
-   No "use client" here. That directive is only needed on the homepage
-   because it tracks hover state; this page is static text, so it renders
-   on the server and ships less JavaScript.
+   Nothing about the page frame lives in this file — no <main>, no
+   background, no column width, no transition wrapper. <CaseStudyShell> owns
+   all four. That's deliberate: the previous version of this page carried its
+   own <main>, forgot bg-background (so it rendered on the black body), was
+   never wrapped for the transition (so the slide-in never fired), and had
+   drifted to a 480px column while the homepage moved to 390px. None of those
+   are reachable from here any more.
 
-   Classes are written out rather than imported from the homepage, so this
-   file stands alone and you can restyle one page without touching others.
+   No "use client" — this is static text, so it renders on the server.
    ========================================================================== */
+
+const study = caseStudy("calpers");
+
+/* Short tab title. The layout's template turns this into
+   "CalPERS — Juan Alvarez" — the full project title would be unreadable in
+   a tab, a bookmark, or a link preview. */
+export const metadata = { title: study.client };
 
 export default function Page() {
   return (
-    <main className="grid min-h-dvh place-items-center px-6 py-16 antialiased">
-      {/* Same 480px column as the homepage, so the two line up. */}
-      <div className="w-full max-w-120">
-        {/* ---- Back link -------------------------------------------- */}
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-1.5 text-[13px] leading-none text-[#4338CA] transition-colors duration-200 hover:text-[#3730A3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4338CA]"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-            className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 ease-out group-hover:-translate-x-0.5"
-          >
-            <path d="M19 12H5M11 18l-6-6 6-6" />
-          </svg>
-          Back
-        </Link>
+    <CaseStudyShell>
+      {/* ---- Back link ---------------------------------------------- */}
+      {/* backLink, not link. The two exist because text-decoration is never
+          painted across an <svg>, so a link with an icon in it needs a
+          border-bottom to get one continuous line under arrow and word.
+          tokens.ts has the full reasoning; nothing here needs to know it. */}
+      <Link href="/" className={`text-sm ${backLink}`}>
+        <ArrowLeft />
+        Back
+      </Link>
 
-        {/* ---- Title ------------------------------------------------- */}
-        <h1 className="mt-8 text-[18px] font-semibold leading-tight text-neutral-800">
-          CalPERS
-        </h1>
+      {/* ---- Title ------------------------------------------------- */}
+      {/* Client above, project below. The h1 is the work itself, and it's the
+          same string the homepage links with — both read it from
+          content/case-studies.ts, so they can't disagree. */}
+      <header className="mt-8">
+        <p className={type.subtext}>{study.client}</p>
+        <h1 className={`mt-1 ${type.showcaseName}`}>{study.title}</h1>
+      </header>
 
-        {/* ---- Body -------------------------------------------------- */}
-        <section className="mt-4 flex flex-col gap-3">
-          <p className="text-[16px] leading-[1.6] text-neutral-700 text-pretty">
-            Supported projects across the software development lifecycle,
-            working alongside engineering to keep design decisions grounded in
-            what could actually ship.
-          </p>
-        </section>
-      </div>
-    </main>
+      {/* ---- Body -------------------------------------------------- */}
+      {/* Add paragraphs here. gap-3 spaces them, so no margins per <p>. */}
+      <section className="mt-4 flex flex-col gap-3">
+        <p className={`${type.body} text-pretty`}>
+          Supported projects across the software development lifecycle, working
+          alongside engineering to keep design decisions grounded in what could
+          actually ship.
+        </p>
+
+        {/* ---- The live site link, and images ----------------------
+            Drop image files in THIS folder, next to page.tsx, then
+            uncomment both the imports at the top and the block below. No
+            width or height — the import carries the real dimensions. Add
+            `wide` to break past the 480px column, up to 760px.
+
+            The imports must be uncommented too, or the build fails on an
+            undefined name. A missing FILE fails the same way, naming the
+            path it couldn't find — so the error always tells you which half
+            you forgot.
+
+            THE PILL GOES ABOVE THE FIGURE, not on it. It states a fact
+            about the project before you show the work; laid over the
+            screenshot it would have to fight whatever pixels are behind it.
+
+        <LiveSitePill href="https://www.calpers.ca.gov" />
+
+        <Figure
+          priority
+          src={contentAudit}
+          alt="The content audit spreadsheet, with 400 pages scored against four criteria"
+          caption="Every page scored before a single one was rewritten."
+        />
+
+        <Figure
+          wide
+          src={releaseFlow}
+          alt="The release flow, from discovery through to QA sign-off"
+          caption="Where design decisions entered the development cycle."
+        />
+
+            For anything else that needs more room than the column — a
+            table, a side-by-side, a full-bleed hero — wrap it yourself:
+
+        <Breakout size="full">…</Breakout>
+        ------------------------------------------------------------- */}
+      </section>
+    </CaseStudyShell>
   );
 }

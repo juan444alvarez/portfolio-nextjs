@@ -1,100 +1,59 @@
-import Image from "next/image";
 import Link from "next/link";
-import { CaseStudyTransition } from "@/components/PageTransition";
-import { ArrowLeft, ExternalLink } from "@/components/icons";
-import { link, linkText, type } from "@/components/tokens";
+import { CaseStudyShell } from "@/components/Shell";
+import { ArrowLeft } from "@/components/icons";
+import { backLink, type } from "@/components/tokens";
+import { caseStudy } from "@/content/case-studies";
 
 /* ==========================================================================
-   CASE STUDY — Ebara
+   CASE STUDY — Ebara   →   app/work/ebara/page.tsx   →   /work/ebara
 
-   Layout differs from home in exactly two ways, both deliberate:
+   Built from app/work/calpers/page.tsx, which carries the full notes on how
+   this template works.
 
-     - Top-aligned, not vertically centered. A case study is a document you
-       read down; home is a card you land on. Same py-16 top padding either
-       way, so the first line starts at the same height on a tall screen.
-
-     - Wider column (480px vs the homepage's 390px). More measure for
-       reading. Nothing in the transition depends on them matching — the
-       wipe is a full-page slide, not a shared element, so there's no edge
-       the eye tracks across the cut.
-
-   bg-background on <main> is NOT optional. body is black (that's what gives
-   the transition its depth), so any page whose main forgets this renders
-   black.
+   ⚠️ PROSE NEEDS YOUR REVIEW. I didn't have your Ebara page, so the
+   paragraphs below are drafted from your own earlier write-up of this
+   project (persona-matched cohorts, two rounds of testing, the mega menu).
+   Check the details and expand — the structure is right, the words are a
+   placeholder.
    ========================================================================== */
+
+const study = caseStudy("ebara");
+
+export const metadata = { title: study.client };
 
 export default function Page() {
   return (
-    <CaseStudyTransition>
-      <main className="min-h-dvh bg-background px-6 py-16 antialiased">
-        <div className="mx-auto w-full max-w-120">
-          {/* Back link. Deliberately untagged — no transitionTypes — so the
-              return trip stays instant, same as the browser back button.
+    <CaseStudyShell>
+      <Link href="/" className={`text-sm ${backLink}`}>
+        <ArrowLeft />
+        Back
+      </Link>
 
-              The arrow is always present and never moves; hover is the
-              underline and the shade, nothing else. Laid out as inline text
-              rather than inline-flex so the underline runs under the arrow
-              too — on a flex box the line would draw at the bottom of the
-              box instead of along the text baseline. */}
-          <Link href="/" className={`${link} text-sm font-medium`}>
-            <ArrowLeft className="mr-1" />
-            <span className={linkText}>Back</span>
-          </Link>
+      <header className="mt-8">
+        <p className={type.subtext}>{study.client}</p>
+        <h1 className={`mt-1 ${type.showcaseName}`}>{study.title}</h1>
+      </header>
 
-          {/* ---- Title ------------------------------------------------ */}
-          {/* showcaseTitle shares everything with the homepage's h1 except
-              its size — same weight, leading, color and balance, two points
-              larger because it's carrying the whole page. */}
-          <h1 className={`mt-2 ${type.showcaseName}`}>
-            Untangling information architecture through end-to-end UX research
-          </h1>
-
-          {/* ---- Note ------------------------------------------------- */}
-          <p className={`mt-3 ${type.body}`}>
-            Live product navigation flow at:{" "}
-            {/* External mark always present, inside the <a> so the underline
-                runs under it on hover like any other link text. */}
-            <a
-              href="https://ebaratechnologies.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={link}
-            >
-              <span className={linkText}>ebaratechnologies.com</span>
-              <span className="sr-only"> (opens in a new tab)</span>
-              <ExternalLink className="ml-1" />
-            </a>
-          </p>
-
-          {/* ---- Hero ------------------------------------------------- */}
-          {/* Fixed aspect + object-cover so a differently-proportioned file
-              crops instead of pushing the text around. bg-neutral-200 holds
-              the space while it loads. priority stays: this is the LCP
-              element for anyone landing here directly. */}
-          <div className="relative mt-4 aspect-2/1 w-full overflow-hidden rounded-sm bg-neutral-200">
-            <Image
-              src="/ebara-preview.png"
-              alt="Grid of Ebara product pages showing the redesigned navigation"
-              fill
-              sizes="480px"
-              className="object-cover"
-              priority
-            />
-          </div>
-
-          {/* ---- Problem ---------------------------------------------- */}
-          <section className="mt-6" aria-labelledby="problem">
-            <h2 id="problem" className={type.name}>
-              Problem
-            </h2>
-            <p className={`mt-3 ${type.body}`}>
-              Diving into the site&apos;s information architecture surfaced that
-              navigation was page-dependent (going one level deeper meant a full
-              page load) so the search for a product was a series of waits.
-            </p>
-          </section>
-        </div>
-      </main>
-    </CaseStudyTransition>
+      <section className="mt-4 flex flex-col gap-3">
+        <p className={`${type.body} text-pretty`}>
+          Recruited participants into persona-matched cohorts through email
+          outreach paired with a screening survey, using the low end of product
+          familiarity as a proxy for first-time visitors and the high end for
+          informed buyers.
+        </p>
+        <p className={`${type.body} text-pretty`}>
+          Testing ran in two rounds: paper prototypes of a proposed navigation
+          against the legacy structure, to isolate the logic from visual bias,
+          then a high-fidelity prototype A/B tested against the live site.
+        </p>
+        <p className={`${type.body} text-pretty`}>
+          The legacy navigation forced users through multiple page loads to
+          reach a specific product. The mega menu I designed surfaced the full
+          information architecture in the navigation bar itself, letting users
+          skip intermediate pages entirely and cutting product findability time
+          by roughly half.
+        </p>
+      </section>
+    </CaseStudyShell>
   );
 }
