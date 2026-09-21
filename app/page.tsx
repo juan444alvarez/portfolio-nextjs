@@ -49,10 +49,11 @@ const SOCIALS: Social[] = [
    wraps and stacks like the bulleted list above it.
 
    Hover lives entirely on the <Link> via the shared `link` token: the
-   underline appears, and nothing else on the row responds. Because it's a
-   real text-decoration underline now rather than a border on a wrapper span,
-   a title that wraps to two lines is underlined on both lines with no
-   box-decoration-clone needed.
+   underline appears, and nothing else on the row responds. Titles here are
+   long and routinely wrap to two or three lines in a 390px column, and every
+   line gets the underline — the token draws it as a bottom border on the
+   anchor itself, and a bottom border paints on every fragment of a wrapped
+   inline box. No wrapper span, and nothing to configure.
    ========================================================================== */
 
 function CaseStudyRow({ study }: { study: CaseStudy }) {

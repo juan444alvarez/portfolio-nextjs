@@ -11,11 +11,14 @@ import type { ReactNode } from "react";
         transition depth), so a page that forgets these renders black. The
         old CalPERS page forgot. Now no page writes them at all.
 
-     2. The column width. TWO deliberate widths now, not one:
+     2. The column width AND the vertical alignment. Home and case studies
+        differ on both, and both differences are deliberate:
 
-          home        390px — a compact card. Short lines, read at a glance.
-          case study  480px — prose that has to carry an argument, plus room
-                              for images to breathe.
+          home        390px, vertically centred — a card you land on.
+          case study  480px, top-aligned — a document you read down.
+
+        Same py-16 either way, so on a tall screen the first line starts at
+        the same height and the transition doesn't jump.
 
         This is the one thing in the project where two numbers are correct.
         It only became safe to have two once each was defined exactly once,
@@ -59,16 +62,23 @@ import type { ReactNode } from "react";
    transitionTypes prop takes; a readonly tuple isn't assignable to it. */
 export const CASE_STUDY_TRANSITION: string[] = ["case-study"];
 
-/* grid + place-items-center centres the column horizontally and vertically;
-   w-full lets it shrink below the cap on phones, and the max-w caps it.
+/* Shared by both: the painted surface, the full viewport height, and the
+   gutters.
 
    ⚠️ px-6 IS COUPLED TO Breakout.tsx. That component subtracts 3rem — this
    1.5rem gutter, doubled — to clamp a wide element to the viewport. Change
    the padding here and you must change the 3rem there, or wide elements
    overhang and the page scrolls sideways on phones. */
-const MAIN = "grid min-h-dvh place-items-center bg-background px-6 py-16";
+const MAIN = "min-h-dvh bg-background px-6 py-16";
+
+/* Home centres its column in the viewport: grid + place-items-center. */
+const HOME_MAIN = `grid place-items-center ${MAIN}`;
 const HOME_COLUMN = "w-full max-w-97.5"; /* 390px */
-const CASE_COLUMN = "w-full max-w-120"; /* 480px */
+
+/* A case study just flows from the top, so no grid — mx-auto is enough to
+   centre it horizontally, and the content grows downward past the fold
+   instead of being pushed around by vertical centring. */
+const CASE_COLUMN = "mx-auto w-full max-w-120"; /* 480px */
 
 /** Wraps the home page. Animates out when a case-study link is used. */
 export function HomeShell({ children }: { children: ReactNode }) {
@@ -77,18 +87,14 @@ export function HomeShell({ children }: { children: ReactNode }) {
       exit={{ "case-study": "page-exit", default: "none" }}
       default="none"
     >
-      <main className={MAIN}>
+      <main className={HOME_MAIN}>
         <div className={HOME_COLUMN}>{children}</div>
       </main>
     </ViewTransition>
   );
 }
 
-/** Wraps a case study page. Animates in when arriving from home.
-
-    place-items-center on MAIN centres this vertically, which is right for a
-    short page and harmless for a long one — once the content is taller than
-    the viewport the centring has nothing left to do and it simply scrolls. */
+/** Wraps a case study page. Animates in when arriving from home. */
 export function CaseStudyShell({ children }: { children: ReactNode }) {
   return (
     <ViewTransition

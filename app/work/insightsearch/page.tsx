@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CaseStudyShell } from "@/components/Shell";
 import { ArrowLeft } from "@/components/icons";
-import { backLink, type } from "@/components/tokens";
+import { link, type } from "@/components/tokens";
 import { caseStudy } from "@/content/case-studies";
 
 /* ==========================================================================
@@ -11,11 +11,14 @@ import { caseStudy } from "@/content/case-studies";
    Built from app/work/calpers/page.tsx, which carries the full notes on how
    this template works.
 
+   No live-site link here, unlike Ebara: this shipped inside Veeva, so
+   there's nothing public to point at.
+
    ⚠️ PROSE NEEDS YOUR REVIEW. I didn't have your InsightSearch page, so the
-   paragraphs below are drafted from your own earlier write-up of this
-   project (learning the technology, working with engineering as a peer,
-   aligning to Veeva's UX, the annotated handoff). Check the details and
-   expand — the structure is right, the words are a placeholder.
+   copy below is drafted from your own earlier write-up of this project
+   (learning the technology, working with engineering as a peer, aligning to
+   Veeva's UX, the annotated handoff). Check it and expand — the structure is
+   right, the words are a placeholder.
    ========================================================================== */
 
 const study = caseStudy("insightsearch");
@@ -25,25 +28,26 @@ export const metadata = { title: study.client };
 export default function Page() {
   return (
     <CaseStudyShell>
-      <Link href="/" className={`text-sm ${backLink}`}>
-        <ArrowLeft />
+      <Link href="/" className={`${link} text-sm font-medium`}>
+        <ArrowLeft className="mr-1" />
         Back
       </Link>
 
-      <header className="mt-8">
-        <p className={type.subtext}>{study.client}</p>
-        <h1 className={`mt-1 ${type.showcaseName}`}>{study.title}</h1>
-      </header>
+      <h1 className={`mt-2 ${type.showcaseName}`}>{study.title}</h1>
 
-      <section className="mt-4 flex flex-col gap-3">
-        <p className={`${type.body} text-pretty`}>
-          UX wasn&rsquo;t at the table when this project started, so I earned a
-          seat by learning the underlying technology well enough to collaborate
-          with engineering as a peer rather than hand work over the wall.
-        </p>
-        <p className={`${type.body} text-pretty`}>
+      <p className={`mt-3 ${type.body}`}>
+        UX wasn&apos;t at the table when this project started, so I earned a
+        seat by learning the underlying technology well enough to collaborate
+        with engineering as a peer rather than hand work over the wall.
+      </p>
+
+      <section className="mt-6" aria-labelledby="constraints">
+        <h2 id="constraints" className={type.name}>
+          Constraints
+        </h2>
+        <p className={`mt-3 ${type.body}`}>
           That grounding let me reconcile design goals with real engineering
-          constraints before build: aligning the interface to Veeva&rsquo;s
+          constraints before build: aligning the interface to Veeva&apos;s
           existing UX patterns and component library, and delivering an
           annotated handoff that made intent legible to the people
           implementing it.

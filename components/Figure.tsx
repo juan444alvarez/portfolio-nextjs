@@ -99,10 +99,10 @@ export function Figure({
   );
 
   return (
-    /* my-3 inside the page's gap-3 flex column adds up to 24px of clearance
-       above and below — flex gap and margins stack, so the figure gets more
-       air than the paragraphs without the paragraphs spreading out. */
-    <figure className="my-3">
+    /* my-4 carries its own vertical rhythm, matching the mt-4 the pages use
+       before a hero. The pages space their own blocks with margins rather
+       than a flex gap, so a figure has to bring its clearance with it. */
+    <figure className="my-4">
       {wide ? <Breakout>{image}</Breakout> : image}
 
       {caption && (

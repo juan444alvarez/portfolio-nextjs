@@ -1,113 +1,105 @@
 import Link from "next/link";
 import { CaseStudyShell } from "@/components/Shell";
 import { ArrowLeft } from "@/components/icons";
-import { backLink, type } from "@/components/tokens";
+import { link, type } from "@/components/tokens";
 import { caseStudy } from "@/content/case-studies";
 
-/* Images live in this folder, beside this file. Uncomment alongside the
-   <Figure> block further down. Also uncomment the Figure import itself. */
+/* Captioned images live in this folder, beside this file. Uncomment these
+   alongside the <Figure> block further down. */
 // import { Figure } from "@/components/Figure";
-// import { LiveSitePill } from "@/components/LiveSitePill";
 // import contentAudit from "./content-audit.png";
-// import releaseFlow from "./release-flow.png";
 
 /* ==========================================================================
    CASE STUDY — CalPERS   →   app/work/calpers/page.tsx   →   /work/calpers
 
    THIS FILE IS THE TEMPLATE. Copy it for a new case study and change two
-   things: the slug passed to caseStudy(), and the prose in <section>.
+   things: the slug passed to caseStudy(), and the prose.
 
    The folder name IS the URL, and it must match the slug in
    content/case-studies.ts. caseStudy() only accepts a slug that exists in
-   that file, so a mismatch is now a type error here rather than a 404 on
-   click.
+   that file, so a mismatch is a type error here rather than a 404 on click.
 
    Nothing about the page frame lives in this file — no <main>, no
-   background, no column width, no transition wrapper. <CaseStudyShell> owns
-   all four. That's deliberate: the previous version of this page carried its
-   own <main>, forgot bg-background (so it rendered on the black body), was
-   never wrapped for the transition (so the slide-in never fired), and had
-   drifted to a 480px column while the homepage moved to 390px. None of those
-   are reachable from here any more.
+   background, no column width, no vertical alignment, no transition wrapper.
+   <CaseStudyShell> owns all five. That's deliberate: the previous version of
+   this page carried its own <main>, forgot bg-background (so it rendered on
+   the black body), was never wrapped for the transition (so the slide-in
+   never fired), and had drifted to a 480px column while the homepage moved
+   to 390px. None of those are reachable from here any more.
+
+   SPACING IS MARGINS, NOT A FLEX GAP. The rhythm isn't uniform — mt-2 under
+   the back link, mt-3 under the title, mt-6 before a new section — and one
+   gap value can't express that. See app/work/ebara/page.tsx for the fuller
+   version of this layout, with a hero and an external link.
 
    No "use client" — this is static text, so it renders on the server.
    ========================================================================== */
 
 const study = caseStudy("calpers");
 
-/* Short tab title. The layout's template turns this into
-   "CalPERS — Juan Alvarez" — the full project title would be unreadable in
-   a tab, a bookmark, or a link preview. */
+/* Short tab title; the layout's template appends the name. */
 export const metadata = { title: study.client };
 
 export default function Page() {
   return (
     <CaseStudyShell>
       {/* ---- Back link ---------------------------------------------- */}
-      {/* backLink, not link. The two exist because text-decoration is never
-          painted across an <svg>, so a link with an icon in it needs a
-          border-bottom to get one continuous line under arrow and word.
-          tokens.ts has the full reasoning; nothing here needs to know it. */}
-      <Link href="/" className={`text-sm ${backLink}`}>
-        <ArrowLeft />
+      {/* Untagged on purpose — no transitionTypes — so the return trip is
+          instant, matching the browser's own back button. The underline runs
+          under the arrow because `link` draws it as a border on the anchor,
+          not as a text-decoration that would stop at the glyph. */}
+      <Link href="/" className={`${link} text-sm font-medium`}>
+        <ArrowLeft className="mr-1" />
         Back
       </Link>
 
-      {/* ---- Title ------------------------------------------------- */}
-      {/* Client above, project below. The h1 is the work itself, and it's the
-          same string the homepage links with — both read it from
-          content/case-studies.ts, so they can't disagree. */}
-      <header className="mt-8">
-        <p className={type.subtext}>{study.client}</p>
-        <h1 className={`mt-1 ${type.showcaseName}`}>{study.title}</h1>
-      </header>
+      {/* ---- Title --------------------------------------------------- */}
+      <h1 className={`mt-2 ${type.showcaseName}`}>{study.title}</h1>
 
-      {/* ---- Body -------------------------------------------------- */}
-      {/* Add paragraphs here. gap-3 spaces them, so no margins per <p>. */}
-      <section className="mt-4 flex flex-col gap-3">
-        <p className={`${type.body} text-pretty`}>
-          Supported projects across the software development lifecycle, working
-          alongside engineering to keep design decisions grounded in what could
-          actually ship.
+      {/* ---- Body ---------------------------------------------------- */}
+      <p className={`mt-3 ${type.body}`}>
+        Supported projects across the software development lifecycle, working
+        alongside engineering to keep design decisions grounded in what could
+        actually ship.
+      </p>
+
+      {/* ---- A section ----------------------------------------------- */}
+      {/* type.name is the section-heading token: one step under this page's
+          own title. Copy this block per section. */}
+      <section className="mt-6" aria-labelledby="problem">
+        <h2 id="problem" className={type.name}>
+          Problem
+        </h2>
+        <p className={`mt-3 ${type.body}`}>
+          Replace this with the real copy.
         </p>
-
-        {/* ---- The live site link, and images ----------------------
-            Drop image files in THIS folder, next to page.tsx, then
-            uncomment both the imports at the top and the block below. No
-            width or height — the import carries the real dimensions. Add
-            `wide` to break past the 480px column, up to 760px.
-
-            The imports must be uncommented too, or the build fails on an
-            undefined name. A missing FILE fails the same way, naming the
-            path it couldn't find — so the error always tells you which half
-            you forgot.
-
-            THE PILL GOES ABOVE THE FIGURE, not on it. It states a fact
-            about the project before you show the work; laid over the
-            screenshot it would have to fight whatever pixels are behind it.
-
-        <LiveSitePill href="https://www.calpers.ca.gov" />
-
-        <Figure
-          priority
-          src={contentAudit}
-          alt="The content audit spreadsheet, with 400 pages scored against four criteria"
-          caption="Every page scored before a single one was rewritten."
-        />
-
-        <Figure
-          wide
-          src={releaseFlow}
-          alt="The release flow, from discovery through to QA sign-off"
-          caption="Where design decisions entered the development cycle."
-        />
-
-            For anything else that needs more room than the column — a
-            table, a side-by-side, a full-bleed hero — wrap it yourself:
-
-        <Breakout size="full">…</Breakout>
-        ------------------------------------------------------------- */}
       </section>
+
+      {/* ---- Adding a captioned image --------------------------------
+          Drop the file in THIS folder, next to page.tsx, then uncomment the
+          two imports at the top and the block below. No width or height —
+          the static import carries the real dimensions. Add `wide` to break
+          past the 480px column, up to 760px.
+
+          Both imports must be uncommented, or the build fails on an
+          undefined name; a missing FILE fails the same way, naming the path
+          it couldn't find. So the error always tells you which half you
+          forgot.
+
+          For a HERO, don't use Figure — see the fixed-aspect block in
+          app/work/ebara/page.tsx and the note explaining why.
+
+      <Figure
+        src={contentAudit}
+        alt="The content audit spreadsheet, with 400 pages scored against four criteria"
+        caption="Every page scored before a single one was rewritten."
+      />
+
+          For anything else needing more room than the column — a table, a
+          side-by-side — wrap it yourself:
+
+      <Breakout size="full">…</Breakout>
+          ------------------------------------------------------------- */}
     </CaseStudyShell>
   );
 }
