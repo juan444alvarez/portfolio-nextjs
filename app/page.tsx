@@ -13,7 +13,7 @@ import { link, type } from "@/components/tokens";
 const SOCIALS: { label: string; href: string; icon: ReactNode }[] = [
   {
     label: "LinkedIn",
-    href: "www.linkedin.com/in/juan-alvarez-045705224",
+    href: "https://www.linkedin.com/in/juan-alvarez-045705224",
     icon: <LinkedInMark />,
   },
   { label: "Resume", href: "/juan-alvarez-resume.pdf", icon: <DocumentMark /> },
