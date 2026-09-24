@@ -1,110 +1,67 @@
 @import "tailwindcss";
 
-/* ==========================================================================
-   DESIGN TOKENS  —  the only place colours are defined
-
-   Every colour below becomes a Tailwind utility through @theme, so nothing
-   in a .tsx file ever writes a hex. That matters more than it sounds: an
-   arbitrary value like text-[#1F4E8C] only works if the complete string is
-   written out literally in a source file, because Tailwind scans text and
-   never runs your JS. Utilities generated from these variables have no such
-   trap — change the hex here and every link follows.
-   ========================================================================== */
-
 :root {
-  /* The page surface. NOT painted by body — see the note further down. Each
-     page gets it from <Shell>, via the bg-background utility. */
+  /* The page surface. body is black on purpose (see below), so every page
+     paints this itself via Shell. */
   --background: #f0f0f0;
 
-  /* The link blue. Steel navy — navy-leaning and desaturated rather than the
-     violet-cast indigo this used to be.
-
-     Contrast on --background is 7.29:1. That clears WCAG AA for normal text
-     (4.5:1) and AAA (7:1), so it holds up at 16px body size, not just for
-     large text. If you ever change this, re-check it against #f0f0f0 — the
-     surface is light, so a lighter blue loses contrast fast. */
-  --accent: #1833b9;
+  /* Link blue. 7.29:1 on --background — clears AA and AAA for body text. */
+  --accent: #0b31a4;
 }
 
-/* Tailwind CSS v4 directive; standard CSS linters do not recognize it. */
 /* stylelint-disable-next-line at-rule-no-unknown */
 @theme inline {
   --color-background: var(--background);
   --color-accent: var(--accent);
-
-  /* --font-geist-sans is set by next/font in layout.tsx. The variable is
-     named differently from --font-sans on purpose: this used to read
-     `--font-sans: var(--font-sans), …`, which referenced itself. It worked
-     only because layout also applied the font's own class. Two names, no
-     ambiguity. */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* BLACK ON PURPOSE — this is what gives the page transition its depth.
-
-   body propagates to the viewport canvas, which paints behind everything.
-   During the transition the outgoing page scales to 0.9 and fades to 0.5,
-   and THIS is what shows through and around it. Without it the page pulls
-   back over more of itself and the motion reads flat.
-
-   Because body no longer paints the page surface, every page needs
-   bg-background and min-h-dvh. That used to be a rule you had to remember
-   per page, and CalPERS forgot it. It is now owned by <Shell>, which is the
-   only thing that renders <main> — so there is nothing left to forget.
-
-   The one place black still shows at rest is the iOS/macOS overscroll
-   bounce. Accepted trade for the depth. */
+/* BLACK ON PURPOSE. body paints the viewport canvas, which is what shows
+   through and around the outgoing page during the transition below. Without
+   it the motion reads flat. Every <main> carries bg-background to cover it. */
 body {
-  background: #111;
+  background: #000000;
+}
+
+/* A 1px edge at 10% black so pale screenshots don't dissolve into the page.
+   outline, not border: it costs no layout. The negative offset puts it on the
+   element's own outermost pixel rather than outside it. Goes on whatever
+   element owns the border-radius. */
+.border-overlay {
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
 }
 
 /* ==========================================================================
-   PAGE TRANSITION  —  home → case study only
+   PAGE TRANSITION — home → case study only
 
-   The link that starts the navigation tags it with a transition type, the
-   <ViewTransition> wrappers inside <Shell> map that type to a class, and the
-   rules below style the class. Three pieces, and all three have to agree:
+   Three pieces have to agree: transitionTypes on the <Link>, the enter/exit
+   keys in Shell.tsx, and the class selectors here.
 
-     Link  transitionTypes={CASE_STUDY_TRANSITION}   ← components/Shell.tsx
-     Shell enter/exit={{ "case-study": "page-…" }}   ← components/Shell.tsx
-     CSS   ::view-transition-old(.page-exit)         ← here
+   Back, swipe-back and refresh carry no transition type, so both wrappers
+   fall to default:"none" and none of this runs. You don't switch it off — it
+   never turns on.
 
-   WHY BACK IS INSTANT: browser back (and swipe back, and refresh) carries no
-   transition type, so both wrappers fall to their `default: "none"` and
-   neither class below is ever applied. Nothing here runs. You don't switch
-   it off — it never turns on.
-
-   CLASS SYNTAX, NOT NAME SYNTAX: the leading dot matters. The enter/exit
-   props assign a view-transition-CLASS. Without the dot these selectors
-   target a view-transition-NAME, match nothing, and you get an instant swap
-   with no error to tell you why.
+   The leading dot matters: enter/exit assign a view-transition-CLASS. Without
+   it these target a NAME, match nothing, and you get a silent instant swap.
    ========================================================================== */
 
 :root {
-  /* The 1000ms this was ported from is an agency-site number, designed to be
-     seen once. A portfolio gets clicked through, so it's dialled back.
-
-     The easing does NOT need adjusting to match. cubic-bezier is normalized:
-     its four numbers describe a curve on a 0→1 grid, and the duration is
-     what stretches that grid onto real time. Same curve, compressed. */
   --page-transition-duration: 700ms;
   --page-transition-ease: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-/* The overlay sits on top of the live page for the full duration and would
-   otherwise swallow clicks — a visitor clicking at 400ms would be clicking
-   into a void. */
+/* The overlay covers the live page for the full duration; without this it
+   swallows clicks. */
 ::view-transition {
   pointer-events: none;
 }
 
-/* The incoming page has to paint over the outgoing one — it slides up from
-   below and covers it. These are two separate groups (two different
-   elements), so their paint order isn't guaranteed without this. */
+/* The incoming page slides up over the outgoing one, so it needs to paint on
+   top. Separate groups don't guarantee that on their own. */
 ::view-transition-group(.page-exit) {
   z-index: 1;
 }
-
 ::view-transition-group(.page-enter) {
   z-index: 2;
 }
@@ -113,15 +70,11 @@ body {
   animation: var(--page-transition-duration) var(--page-transition-ease) both
     page-out;
 }
-
 ::view-transition-new(.page-enter) {
   animation: var(--page-transition-duration) var(--page-transition-ease) both
     page-in;
 }
 
-/* scale and translateY are one `transform` here rather than two properties,
-   which composes the same way visually and keeps them on one compositor
-   animation. */
 @keyframes page-out {
   from {
     opacity: 1;
@@ -142,9 +95,7 @@ body {
   }
 }
 
-/* A full-viewport vertical slide is the most common motion-sickness trigger.
-   Collapse it to the browser's default instant swap for anyone who's asked
-   for less motion. */
+/* A full-viewport vertical slide is a common motion-sickness trigger. */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),

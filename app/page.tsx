@@ -3,88 +3,48 @@ import Image from "next/image";
 import Link from "next/link";
 import { CASE_STUDY_TRANSITION, HomeShell } from "@/components/Shell";
 import { DocumentMark, LinkedInMark } from "@/components/icons";
-import { iconLink, link, type } from "@/components/tokens";
-import {
-  CASE_STUDIES,
-  caseStudyHref,
-  type CaseStudy,
-} from "@/content/case-studies";
+import { link, type } from "@/components/tokens";
 
-/* ==========================================================================
-   HOME   →   app/page.tsx   →   /
+/* No "use client" — nothing here uses hooks, and Link and ViewTransition both
+   work from a server component, so this ships no component JavaScript. */
 
-   No "use client". It came off with the hover state this page used to track;
-   Link and ViewTransition both work from a server component, so this now
-   renders on the server and ships no component JavaScript of its own.
-
-   The case study list lives in content/case-studies.ts, not here.
-   ========================================================================== */
-
-/* Both of these open a new tab — LinkedIn because it leaves the site, the
-   resume because losing the page to a PDF viewer is worse than a new tab. So
-   there's no conditional: target and rel are the same for every entry, and
-   the old hrefFor / linkTargetProps / isExternal machinery is gone with the
-   external case study links it existed for. */
-type Social = { label: string; href: string; icon: ReactNode };
-
-const SOCIALS: Social[] = [
+/* Both open in a new tab: LinkedIn because it leaves the site, the resume
+   because losing the page to a PDF viewer is worse. */
+const SOCIALS: { label: string; href: string; icon: ReactNode }[] = [
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/juanalvarez",
+    href: "www.linkedin.com/in/juan-alvarez-045705224",
     icon: <LinkedInMark />,
   },
-  {
-    label: "Resume",
-    href: "/juan-alvarez-resume.pdf",
-    icon: <DocumentMark />,
-  },
+  { label: "Resume", href: "/juan-alvarez-resume.pdf", icon: <DocumentMark /> },
 ];
 
-/* ==========================================================================
-   CASE STUDY ROW
-
-   One paragraph:  [ linked title ] · [ outcome ]
-
-   No image, no frame, no fixed row height — the row is just prose, so it
-   wraps and stacks like the bulleted list above it.
-
-   Hover lives entirely on the <Link> via the shared `link` token: the
-   underline appears, and nothing else on the row responds. Titles here are
-   long and routinely wrap to two or three lines in a 390px column, and every
-   line gets the underline — the token draws it as a bottom border on the
-   anchor itself, and a bottom border paints on every fragment of a wrapped
-   inline box. No wrapper span, and nothing to configure.
-   ========================================================================== */
-
-function CaseStudyRow({ study }: { study: CaseStudy }) {
-  return (
-    <p className={type.body}>
-      {/* transitionTypes tags THIS navigation as "case-study". That tag is
-          what the ViewTransition wrappers in Shell key on — without it here,
-          both wrappers fall to default:"none" and nothing animates. */}
-      <Link
-        href={caseStudyHref(study)}
-        transitionTypes={CASE_STUDY_TRANSITION}
-        className={`font-medium ${link}`}
-      >
-        {study.title}
-      </Link>
-
-      <span aria-hidden className="px-1.5">
-        ·
-      </span>
-
-      {study.outcome}
-    </p>
-  );
-}
-
-/* ========================================================================== */
+/* slug must match a folder under app/work/. Nothing typechecks that — a wrong
+   slug compiles, renders, and 404s only on click. */
+const CASE_STUDIES = [
+  {
+    slug: "ebara",
+    title: "Untangling information architecture through end-to-end UX research",
+    outcome:
+      "Cut average product findability time by ~50% with a mega menu design.",
+  },
+  {
+    slug: "calpers",
+    title: "Aligning content strategy with the software development lifecycle",
+    outcome: "Supported project teams from discovery through release.",
+  },
+  {
+    slug: "insightsearch",
+    title: "Driving UX strategy for AI-powered document search",
+    outcome:
+      "Reconciled design goals with engineering constraints ahead of build.",
+  },
+];
 
 export default function Page() {
   return (
     <HomeShell>
-      {/* ---- Section 1: identity -------------------------------------- */}
+      {/* ---- Identity ------------------------------------------------- */}
       <header className="flex items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <Image
@@ -96,26 +56,24 @@ export default function Page() {
           />
           <div className="flex flex-col gap-px">
             <h1 className={type.name}>Juan Alvarez</h1>
-            {/* Plain text — not a link, no pointer. */}
             <p className={type.subtext}>juan444alvarez@gmail.com</p>
           </div>
         </div>
 
-        {/* No negative margin — icons sit inside the column edge, so
-            everything lines up within the same rectangle. */}
         <nav aria-label="Social links">
           <ul className="flex items-center gap-2">
             {SOCIALS.map((social) => (
               <li key={social.label}>
+                {/* Icon-only, so the new-tab warning goes in the accessible
+                    name — there's no visible text to hang an sr-only span off.
+                    p-1 takes the 16px icon to a 24px target. */}
                 <a
                   href={social.href}
-                  /* The new-tab warning belongs in the accessible name, since
-                     there's no visible text to hang an sr-only span off. */
                   aria-label={`${social.label} (opens in a new tab)`}
                   title={social.label}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={iconLink}
+                  className="inline-flex items-center border-b border-transparent p-1 text-accent hover:border-current focus-visible:border-current"
                 >
                   {social.icon}
                 </a>
@@ -125,24 +83,22 @@ export default function Page() {
         </nav>
       </header>
 
-      {/* ---- Section 2: about ----------------------------------------- */}
+      {/* ---- About ---------------------------------------------------- */}
       <section className="mt-3.5 flex flex-col gap-3">
         <p className={type.body}>
           Four years of work experience and a Design B.A. from UC Davis have
           shaped my design thinking with:
         </p>
 
-        {/* pl-5 clears the bullet. The marker is set one step lighter than
-            the text so the dots read as structure, not content. */}
         <ul className="-mt-1 flex list-disc flex-col gap-0.5 pl-5 marker:text-neutral-700">
-          <li className={type.body}>the agency to build ideas</li>
+          <li className={type.body}>the tools to build ideas</li>
           <li className={type.body}>
             a habit of continuous discovery for business needs
           </li>
         </ul>
       </section>
 
-      {/* ---- Section 3: featured work --------------------------------- */}
+      {/* ---- Featured work -------------------------------------------- */}
       <section className="mt-4" aria-labelledby="work">
         <h2 id="work" className={type.homeTitle}>
           Featured Work Experience
@@ -154,7 +110,21 @@ export default function Page() {
               key={study.slug}
               className="py-4.5 text-balance first:pt-0 last:pb-0"
             >
-              <CaseStudyRow study={study} />
+              <p className={type.body}>
+                {/* transitionTypes tags THIS navigation. Without it both
+                    wrappers fall to default:"none" and nothing animates. */}
+                <Link
+                  href={`/work/${study.slug}`}
+                  transitionTypes={CASE_STUDY_TRANSITION}
+                  className={`font-medium ${link}`}
+                >
+                  {study.title}
+                </Link>
+                <span aria-hidden className="px-1.5">
+                  ·
+                </span>
+                {study.outcome}
+              </p>
             </li>
           ))}
         </ul>

@@ -1,39 +1,25 @@
 import Link from "next/link";
 import { CaseStudyShell } from "@/components/Shell";
-import { ArrowLeft } from "@/components/icons";
-import { link, type } from "@/components/tokens";
-import { caseStudy } from "@/content/case-studies";
+import { ReturnArrow } from "@/components/icons";
+import { backButton, type } from "@/components/tokens";
 
-/* ==========================================================================
-   CASE STUDY — InsightSearch
-   →   app/work/insightsearch/page.tsx   →   /work/insightsearch
+/* Built from app/work/calpers/page.tsx, which carries the notes.
 
-   Built from app/work/calpers/page.tsx, which carries the full notes on how
-   this template works.
+   ⚠️ Prose below is drafted from your own earlier write-up of this project —
+   check it and expand. The structure is right, the words are a placeholder. */
 
-   No live-site link here, unlike Ebara: this shipped inside Veeva, so
-   there's nothing public to point at.
-
-   ⚠️ PROSE NEEDS YOUR REVIEW. I didn't have your InsightSearch page, so the
-   copy below is drafted from your own earlier write-up of this project
-   (learning the technology, working with engineering as a peer, aligning to
-   Veeva's UX, the annotated handoff). Check it and expand — the structure is
-   right, the words are a placeholder.
-   ========================================================================== */
-
-const study = caseStudy("insightsearch");
-
-export const metadata = { title: study.client };
+export const metadata = { title: "Veeva Systems" };
 
 export default function Page() {
   return (
     <CaseStudyShell>
-      <Link href="/" className={`${link} text-sm font-medium`}>
-        <ArrowLeft className="mr-1" />
-        Back
+      <Link href="/" aria-label="Home" className={backButton}>
+        <ReturnArrow className="mr-0.5" />
       </Link>
 
-      <h1 className={`mt-2 ${type.showcaseName}`}>{study.title}</h1>
+      <h1 className={`mt-4 ${type.showcaseName}`}>
+        Driving UX strategy for AI-powered document search
+      </h1>
 
       <p className={`mt-3 ${type.body}`}>
         UX wasn&apos;t at the table when this project started, so I earned a
@@ -49,8 +35,8 @@ export default function Page() {
           That grounding let me reconcile design goals with real engineering
           constraints before build: aligning the interface to Veeva&apos;s
           existing UX patterns and component library, and delivering an
-          annotated handoff that made intent legible to the people
-          implementing it.
+          annotated handoff that made intent legible to the people implementing
+          it.
         </p>
       </section>
     </CaseStudyShell>
