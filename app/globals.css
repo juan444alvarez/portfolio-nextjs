@@ -3,7 +3,7 @@
 :root {
   /* The page surface. body is black on purpose (see below), so every page
      paints this itself via Shell. */
-  --background: #f0f0f0;
+  --background: #f5f5f5;
 
   /* Link blue. 7.29:1 on --background — clears AA and AAA for body text. */
   --accent: #0b31a4;

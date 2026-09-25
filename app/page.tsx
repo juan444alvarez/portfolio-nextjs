@@ -1,23 +1,12 @@
-import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CASE_STUDY_TRANSITION, HomeShell } from "@/components/Shell";
-import { DocumentMark, LinkedInMark } from "@/components/icons";
 import { link, type } from "@/components/tokens";
 
 /* No "use client" — nothing here uses hooks, and Link and ViewTransition both
    work from a server component, so this ships no component JavaScript. */
 
-/* Both open in a new tab: LinkedIn because it leaves the site, the resume
-   because losing the page to a PDF viewer is worse. */
-const SOCIALS: { label: string; href: string; icon: ReactNode }[] = [
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/juan-alvarez-045705224",
-    icon: <LinkedInMark />,
-  },
-  { label: "Resume", href: "/juan-alvarez-resume.pdf", icon: <DocumentMark /> },
-];
+const LINKEDIN_URL = "https://www.linkedin.com/in/juan-alvarez-045705224";
 
 /* slug must match a folder under app/work/. Nothing typechecks that — a wrong
    slug compiles, renders, and 404s only on click. */
@@ -45,42 +34,23 @@ export default function Page() {
   return (
     <HomeShell>
       {/* ---- Identity ------------------------------------------------- */}
-      <header className="flex items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <Image
-            src="/avatar.jpeg"
-            alt="Juan Alvarez"
-            width={44}
-            height={44}
-            className="h-11 w-11 shrink-0 rounded-full bg-neutral-200 object-cover"
-          />
-          <div className="flex flex-col gap-px">
-            <h1 className={type.name}>Juan Alvarez</h1>
-            <p className={type.subtext}>juan444alvarez@gmail.com</p>
-          </div>
+      <header className="flex items-center gap-3">
+        <Image
+          src="/avatar.jpeg"
+          alt="Juan Alvarez"
+          width={44}
+          height={44}
+          className="h-11 w-11 shrink-0 rounded-full object-cover outline-gray-300 outline-1"
+        />
+        <div className="flex flex-col">
+          <h1 className={type.name}>Juan Alvarez</h1>
+          <p className={`${type.subtext} -mt-0.5`}>
+            <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className={link} >
+              View my LinkedIn
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </p>
         </div>
-
-        <nav aria-label="Social links">
-          <ul className="flex items-center gap-2">
-            {SOCIALS.map((social) => (
-              <li key={social.label}>
-                {/* Icon-only, so the new-tab warning goes in the accessible
-                    name — there's no visible text to hang an sr-only span off.
-                    p-1 takes the 16px icon to a 24px target. */}
-                <a
-                  href={social.href}
-                  aria-label={`${social.label} (opens in a new tab)`}
-                  title={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center border-b border-transparent p-1 text-accent hover:border-current focus-visible:border-current"
-                >
-                  {social.icon}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
       </header>
 
       {/* ---- About ---------------------------------------------------- */}
