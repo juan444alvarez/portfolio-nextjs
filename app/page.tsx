@@ -55,15 +55,11 @@ export default function Page() {
 
       {/* ---- About ---------------------------------------------------- */}
       <section className="mt-3.5 flex flex-col gap-3">
-        <p className={type.body}>
-          Four years of work experience and a Design B.A. from UC Davis have
-          shaped my design thinking with:
-        </p>
-
+        <p className={type.body}>Four years of work experience and a Design B.A. from UC Davis shaped my design thinking with:</p>
         <ul className="-mt-1 flex list-disc flex-col gap-0.5 pl-5 marker:text-neutral-700">
           <li className={type.body}>the agency to build ideas</li>
           <li className={type.body}>
-            a habit of continuous discovery for business needs
+            a habit of uncovering business needs
           </li>
         </ul>
       </section>

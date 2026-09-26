@@ -23,7 +23,7 @@ export const backButton =
    showcaseName  case study h1
    subtext       email, captions */
 export const type = {
-  body: "text-base leading-[1.5625] text-neutral-900",
+  body: "text-[17px] leading-[1.5625] text-neutral-900",
   homeTitle: "text-[17px] font-medium leading-snug text-neutral-800",
   name: "text-lg font-semibold leading-snug tracking-tight text-neutral-700",
   showcaseName:
