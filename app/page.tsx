@@ -61,7 +61,7 @@ export default function Page() {
         </p>
 
         <ul className="-mt-1 flex list-disc flex-col gap-0.5 pl-5 marker:text-neutral-700">
-          <li className={type.body}>the tools to build ideas</li>
+          <li className={type.body}>the agency to build ideas</li>
           <li className={type.body}>
             a habit of continuous discovery for business needs
           </li>
