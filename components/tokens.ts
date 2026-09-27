@@ -1,32 +1,37 @@
-/* Shared class strings. Plain strings, no "use client" — these import into
-   server and client components alike.
+/* ==========================================================================
+   SHARED TOKENS
 
-   Colours come from the `accent` utility that globals.css generates. Don't
-   write a hex here: an arbitrary value only becomes a class if that exact
-   string appears in source, so interpolating a constant produces nothing. */
+   One definition, imported by the home page and every showcase, so the two
+   can't drift. Plain strings, no "use client" — these import into server
+   and client components alike.
 
-/* Every link with words in it. A plain text-decoration underline on hover —
-   which means it stops before a trailing external icon, and that's the
-   conventional look. */
-export const link =
-  "text-accent decoration-1 underline-offset-[3px] hover:underline focus-visible:underline";
+     name          home page h1, showcase section headings
+     showcaseName  showcase h1
+     homeTitle     home page h2
+     body          bio, bullets, showcase rows, showcase prose
+     subtext       small text under the name
+     caption       under showcase images
 
-/* The back control: a round icon-only button, so there are no words for an
-   underline to sit under. 36px clears the 24px WCAG minimum for a pointer
-   target. The tint is over --background, so it follows if that changes. */
-export const backButton =
-  "flex size-9 shrink-0 items-center justify-center rounded-full bg-black/[0.04] text-accent transition duration-150 hover:bg-black/[0.08] active:scale-[0.96]";
+   NOTE: Tailwind only generates classes it can find written out in full in
+   the source, so never build these by joining fragments at runtime.
+   ========================================================================== */
 
-/* body          bio, bullets, project rows, case study prose
-   name          homepage h1, and case study section headings
-   homeTitle     homepage h2
-   showcaseName  case study h1
-   subtext       email, captions */
+const heading = "font-semibold leading-tight tracking-tight text-neutral-700";
+
 export const type = {
-  body: "text-[1.125rem] leading-[1.5625] tracking-[-0.0125em] text-neutral-950",
-  homeTitle: "text-[1.25rem] font-medium leading-snug text-neutral-800",
-  name: "text-[1.3125rem] font-semibold leading-snug tracking-tight text-neutral-800",
-  showcaseName:
-    "text-[2rem] font-semibold leading-snug tracking-tight text-neutral-700",
-  subtext: "text-[1rem] text-neutral-900/80",
+  body: "text-base leading-relaxed text-pretty text-neutral-900",
+  subtext: "text-sm leading-normal text-neutral-900/80",
+  homeTitle: "text-[17px] font-medium leading-tight text-neutral-800",
+  name: `text-lg ${heading}`,
+  showcaseName: `max-w-[28ch] text-xl ${heading}`,
+  caption: "text-sm leading-normal text-neutral-900/80 text-center text-balance",
 } as const;
+
+/* Text links: accent blue, underline appears on hover or keyboard focus. */
+export const link =
+  "text-accent underline-offset-4 decoration-1 hover:underline focus-visible:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+/* The icon-only "back to home" link at the top of each showcase. 32px hit
+   area; the negative margin lines the icon itself up with the text below. */
+export const backButton =
+  "-ml-2 inline-flex h-8 w-8 items-center justify-center rounded-sm text-accent transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";

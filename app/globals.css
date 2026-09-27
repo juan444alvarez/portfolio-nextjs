@@ -33,10 +33,14 @@ body {
 }
 
 /* ==========================================================================
-   PAGE TRANSITION — home → case study only
+   SHOWCASE TRANSITION — home → showcase only
 
-   Three pieces have to agree: transitionTypes on the <Link>, the enter/exit
-   keys in Shell.tsx, and the class selectors here.
+   Three pieces have to agree:
+     1. transitionTypes={SHOWCASE_TRANSITION} on the home page's <Link>
+        (the type is "showcase")
+     2. the enter/exit keys in components/Shell.tsx, which turn that type
+        into the classes "home-exit" and "showcase-enter"
+     3. the class selectors below
 
    Back, swipe-back and refresh carry no transition type, so both wrappers
    fall to default:"none" and none of this runs. You don't switch it off — it
@@ -47,8 +51,8 @@ body {
    ========================================================================== */
 
 :root {
-  --page-transition-duration: 700ms;
-  --page-transition-ease: cubic-bezier(0.76, 0, 0.24, 1);
+  --showcase-duration: 700ms;
+  --showcase-ease: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /* The overlay covers the live page for the full duration; without this it
@@ -57,25 +61,31 @@ body {
   pointer-events: none;
 }
 
-/* The incoming page slides up over the outgoing one, so it needs to paint on
-   top. Separate groups don't guarantee that on their own. */
-::view-transition-group(.page-exit) {
+/* Everything outside the two shells (just the black body) skips the
+   browser's default crossfade. That's what makes back, swipe-back and
+   refresh a truly instant swap, rather than a quick fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+/* The incoming showcase slides up over the outgoing home page, so it needs
+   to paint on top. Separate groups don't guarantee that on their own. */
+::view-transition-group(.home-exit) {
   z-index: 1;
 }
-::view-transition-group(.page-enter) {
+::view-transition-group(.showcase-enter) {
   z-index: 2;
 }
 
-::view-transition-old(.page-exit) {
-  animation: var(--page-transition-duration) var(--page-transition-ease) both
-    page-out;
+::view-transition-old(.home-exit) {
+  animation: var(--showcase-duration) var(--showcase-ease) both home-out;
 }
-::view-transition-new(.page-enter) {
-  animation: var(--page-transition-duration) var(--page-transition-ease) both
-    page-in;
+::view-transition-new(.showcase-enter) {
+  animation: var(--showcase-duration) var(--showcase-ease) both showcase-in;
 }
 
-@keyframes page-out {
+@keyframes home-out {
   from {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -86,7 +96,7 @@ body {
   }
 }
 
-@keyframes page-in {
+@keyframes showcase-in {
   from {
     transform: translateY(100%);
   }
@@ -104,3 +114,5 @@ body {
     animation-delay: 0s !important;
   }
 }
+
+/* Hover lines need no CSS here — components/HoverLines.tsx carries its own. */
