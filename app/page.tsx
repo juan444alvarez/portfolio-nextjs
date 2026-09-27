@@ -15,18 +15,18 @@ const CASE_STUDIES = [
     slug: "ebara",
     title: "Untangling information architecture through end-to-end UX research",
     outcome:
-      "Cut average product findability time by ~50% with a mega menu design.",
+      "Cut average product findability time by ~40% with a mega menu",
   },
   {
     slug: "calpers",
     title: "Aligning content strategy with the software development lifecycle",
-    outcome: "Supported project teams from discovery through release.",
+    outcome: "Supported project teams from discovery through release",
   },
   {
     slug: "insightsearch",
     title: "Driving UX strategy for AI-powered document search",
     outcome:
-      "Reconciled design goals with engineering constraints ahead of build.",
+      "Reconciled design goals with engineering constraints ahead of build",
   },
 ];
 
@@ -40,7 +40,7 @@ export default function Page() {
           alt="Juan Alvarez"
           width={44}
           height={44}
-          className="h-11 w-11 shrink-0 rounded-full object-cover outline-gray-300 outline-1"
+          className="h-12 w-12 shrink-0 rounded-full object-cover outline-gray-300 outline-1"
         />
         <div className="flex flex-col">
           <h1 className={type.name}>Juan Alvarez</h1>
@@ -74,7 +74,7 @@ export default function Page() {
           {CASE_STUDIES.map((study) => (
             <li
               key={study.slug}
-              className="py-4.5 text-balance first:pt-0 last:pb-0"
+              className="py-4.5 first:pt-0 last:pb-0"
             >
               <p className={type.body}>
                 {/* transitionTypes tags THIS navigation. Without it both
@@ -82,7 +82,7 @@ export default function Page() {
                 <Link
                   href={`/work/${study.slug}`}
                   transitionTypes={CASE_STUDY_TRANSITION}
-                  className={`font-medium ${link}`}
+                  className={`font-semibold tracking-normal ${link}`}
                 >
                   {study.title}
                 </Link>

@@ -27,7 +27,7 @@ export function HomeShell({ children }: { children: ReactNode }) {
       default="none"
     >
       <main className={`grid place-items-center ${MAIN}`}>
-        <div className="w-full max-w-97.5">{children}</div>
+        <div className="w-full max-w-97">{children}</div>
       </main>
     </ViewTransition>
   );
