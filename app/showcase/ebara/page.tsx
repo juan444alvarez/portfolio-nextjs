@@ -20,6 +20,11 @@ export default function Page() {
       <h1 className={`mt-4 ${type.showcaseName}`}>
         Untangling information architecture through end-to-end UX research
       </h1>
+        <p className={`mt-3 ${type.body}`}>
+          Diving into the site&apos;s information architecture surfaced that
+          navigation was page-dependent (going one level deeper meant a full
+          page load) so the search for a product was a series of waits.
+        </p>
 
       <p className={`mt-3 ${type.body}`}>
         View my &apos;Products&apos; navbar flow at{" "}
@@ -52,17 +57,6 @@ export default function Page() {
           priority
         />
       </div>
-
-      <section className="mt-6" aria-labelledby="problem">
-        <h2 id="problem" className={type.name}>
-          Problem
-        </h2>
-        <p className={`mt-3 ${type.body}`}>
-          Diving into the site&apos;s information architecture surfaced that
-          navigation was page-dependent (going one level deeper meant a full
-          page load) so the search for a product was a series of waits.
-        </p>
-      </section>
     </ShowcaseShell>
   );
 }
