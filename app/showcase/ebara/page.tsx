@@ -21,28 +21,9 @@ export default function Page() {
         Untangling information architecture through end-to-end UX research
       </h1>
         <p className={`mt-3 ${type.body}`}>
-          Diving into the site&apos;s information architecture surfaced that
-          navigation was page-dependent (going one level deeper meant a full
-          page load) so the search for a product was a series of waits.
+          A heuristic analysis surfaced that site navigation was page-dependent. Going one level deeper meant a full page load, so the search for a product was a series of waits.
         </p>
 
-      <p className={`mt-3 ${type.body}`}>
-        View my &apos;Products&apos; navbar flow at{" "}
-        <a
-          href="https://ebaratech.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={link}
-        >
-          {/* nowrap keeps the icon tied to the domain, so it never wraps alone.
-              sr-only rather than aria-label: aria-label replaces text instead of adding to it. */}
-          <span className="inline-flex items-center whitespace-nowrap">
-            ebaratech.com
-            <span className="sr-only"> (opens in a new tab)</span>
-            <ExternalLink className="ml-1 h-4 w-4" />
-          </span>
-        </a>
-      </p>
 
       {/* Fixed aspect + object-cover so a differently-proportioned file crops
           instead of pushing the text around. priority: this is the

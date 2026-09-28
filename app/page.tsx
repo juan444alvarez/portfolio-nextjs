@@ -15,7 +15,7 @@ const SHOWCASES = [
   {
     slug: "ebara",
     title: "Untangling information architecture through end-to-end UX research",
-    outcome: "Cut average product findability time by ~40% with a mega menu",
+    outcome: "Cut average product findability time by ~40% with a mega menu design.",
     hoverLines: true,
   },
   {
