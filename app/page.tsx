@@ -56,7 +56,7 @@ export default function Page() {
       {/* ---- About ---------------------------------------------------- */}
       <section className="mt-3.5 flex flex-col gap-3">
         <p className={type.body}>
-          Four years of work experience and a Design B.A. from UC Davis shaped
+          Three years of work experience and a Design B.A. from UC Davis shape
           my design thinking with:
         </p>
         <ul className="-mt-1 flex list-disc flex-col gap-0.5 pl-5 marker:text-neutral-700">
