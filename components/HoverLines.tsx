@@ -49,21 +49,21 @@ type Config = {
 const CONFIG: Config = {
   style: "chaos", // "chaos" edge to edge | "corners" | "echoes" of the original squiggle
   cornerMode: "all", // corners only: "all" four corners, or "one" per hover
-  lines: 10,
-  strokeWidth: 7.5, // px
+  lines: 12,
+  strokeWidth: 6, // px
   colors: ["#1D35E0", "#2F4BFF", "#3D7BFF", "#5B9BFF", "#2563C9", "#7FB2FF", "#4450D9"],
-  wobble: 0.25, // 0 = straight, 1 = very loopy
-  variety: 0.6, // spread of width and speed between lines
+  wobble: 0.35, // 0 = straight, 1 = very loopy
+  variety: 0.75, // spread of width and speed between lines
   crossers: 0, // share of lines allowed through the content
-  pad: 0, // px kept clear around the content
-  drawDuration: 1300, // ms
+  pad: 24, // px kept clear around the content
+  drawDuration: 1100, // ms
   stagger: 60, // ms between each line starting
   easing: "cubic-bezier(0.22, 1, 0.36, 1)",
   startFrom: "start", // each line draws from its "start" or its "end"
   exit: "retract", // "retract" | "fade" | "instant"
   exitDuration: 500, // ms
   layer: "over", // "over" or "behind" the content
-  lean: 0.7, // share of lines that gather on one or two sides; 0 = spread evenly
+  lean: 0.6, // share of lines that gather on one or two sides; 0 = spread evenly
   diagonal: 0.75, // share of lines that sweep diagonally
   frameGuard: 0.7, // most of the space around the content lines may wrap past; 1 = off
 };

@@ -33,15 +33,8 @@ export const CASE_STUDIES = [
   {
     slug: "calpers",
     client: "CalPERS",
-    title: "Aligning content strategy with the software development lifecycle",
-    outcome: "Supported project teams from discovery through release.",
-  },
-  {
-    slug: "insightsearch",
-    client: "Veeva Systems",
-    title: "Driving UX strategy for AI-powered document search",
-    outcome:
-      "Reconciled design goals with engineering constraints ahead of build.",
+    title: "Collaborating across teams through analysis, design, and release",
+    outcome: "Ran research, supported design, and validated builds with engineers and analysts.",
   },
 ] as const;
 

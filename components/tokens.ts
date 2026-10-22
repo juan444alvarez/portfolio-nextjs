@@ -19,11 +19,13 @@
 const heading = "font-semibold leading-tight tracking-tight text-neutral-700";
 
 export const type = {
-  body: "text-base leading-relaxed text-pretty text-neutral-900",
+  body: "text-base leading-[1.4] text-pretty text-neutral-900",
   subtext: "text-sm leading-normal text-neutral-900/80",
   homeTitle: "text-[17px] font-medium leading-tight text-neutral-800",
   name: `text-lg ${heading}`,
   showcaseName: `max-w-[28ch] text-xl ${heading}`,
+  showcaseHeading: `max-w-[28ch] text-lg ${heading}`,
+  showcaseHeadingSecondary: `max-w-[28ch] text-md ${heading}`,
   caption: "text-sm leading-normal text-neutral-900/80 text-center text-balance",
 } as const;
 

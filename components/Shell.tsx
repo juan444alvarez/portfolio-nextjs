@@ -30,7 +30,7 @@ export function HomeShell({ children }: { children: ReactNode }) {
       default="none"
     >
       <main className={`grid place-items-center ${MAIN}`}>
-        <div data-hover-lines-avoid className="relative z-10 w-full max-w-97">
+        <div data-hover-lines-avoid className="relative z-10 w-full max-w-100">
           {children}
         </div>
         <HoverLines />
@@ -47,7 +47,7 @@ export function ShowcaseShell({ children }: { children: ReactNode }) {
       default="none"
     >
       <main className={MAIN}>
-        <div className="mx-auto w-full max-w-120">{children}</div>
+        <div className="mx-auto w-full max-w-123">{children}</div>
       </main>
     </ViewTransition>
   );

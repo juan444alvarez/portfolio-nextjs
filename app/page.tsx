@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomeShell, SHOWCASE_TRANSITION } from "@/components/Shell";
 import { link, type } from "@/components/tokens";
+import { NdaTooltip } from "@/components/NdaTooltip";
 
 /* No "use client" — nothing here uses hooks, and Link and ViewTransition both
    work from a server component. The hover lines are mounted by HomeShell. */
@@ -20,14 +21,11 @@ const SHOWCASES = [
   },
   {
     slug: "calpers",
-    title: "Aligning content strategy with the software development lifecycle",
-    outcome: "Supported project teams from discovery through release",
+    title: "Collaborating across teams through analysis, design, and release",
+    outcome: "Ran research, supported design, and validated builds with engineers and analysts.",
+    nda: true,
   },
-  {
-    slug: "veeva",
-    title: "Driving UX strategy for AI-powered document search",
-    outcome: "Reconciled design goals with engineering constraints ahead of build",
-  },
+
 ];
 
 export default function Page() {
@@ -75,21 +73,26 @@ export default function Page() {
           {SHOWCASES.map((showcase) => (
             <li key={showcase.slug} className="py-4.5 first:pt-0 last:pb-0">
               <p className={type.body}>
-                {/* transitionTypes tags THIS navigation. Without it both
-                    wrappers fall to default:"none" and nothing animates. */}
-                <Link
-                  href={`/showcase/${showcase.slug}`}
-                  transitionTypes={SHOWCASE_TRANSITION}
-                  className={`font-semibold tracking-normal ${link}`}
-                  data-hover-lines={"hoverLines" in showcase ? true : undefined}
-                >
-                  {showcase.title}
-                </Link>
-                <span aria-hidden className="px-1.5">
-                  ·
-                </span>
-                {showcase.outcome}
-              </p>
+  {"nda" in showcase ? (
+    <NdaTooltip className={`cursor-default font-semibold tracking-normal ${link}`}>
+      {showcase.title}
+    </NdaTooltip>
+  ) : (
+    <Link
+      href={`/showcase/${showcase.slug}`}
+      transitionTypes={SHOWCASE_TRANSITION}
+      className={`font-semibold tracking-normal ${link}`}
+      data-hover-lines={"hoverLines" in showcase ? true : undefined}
+    >
+      {showcase.title}
+    </Link>
+  )}
+  <span aria-hidden className="px-1.5">
+    ·
+  </span>
+  {showcase.outcome}
+</p>
+              
             </li>
           ))}
         </ul>
