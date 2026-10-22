@@ -176,6 +176,17 @@ export default function Page() {
       <h1 className={`mt-4 ${type.showcaseName}`}>
         Untangling information architecture through end-to-end UX research
       </h1>
+            <a
+        href="https://ebaratech.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="my-4 flex w-fit items-center gap-1.5 rounded-full bg-neutral-200 px-3 py-1 text-sm leading-5 text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+      >
+        ebaratech.com
+        <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
+        <span className="sr-only">(opens in a new tab)</span>
+      </a>
+
       <p className={`mt-3 ${type.body}`}>
         With an extensive product catalog, finding specific products took several steps. Visitors clicked through a category page, then a product family, and finally... the product.
       </p>
@@ -186,8 +197,11 @@ export default function Page() {
         I researched the problem and redesigned the navigation as a mega menu focused on progressive reveal.
       </p>
 
-      {/* Before sits under After. Drag the pill to wipe between them. Both files
-          live in /public and should be 2:1 so nothing gets cropped. */}
+      {/* Before sits under After. Drag the handle to wipe between them. The
+          screenshots are different sizes, so the box takes the After ratio
+          (1429 x 618) and shows it whole; Before (1424 x 766) is scaled to the
+          same width and trimmed at the bottom, where its menu runs off anyway.
+          Both files live in /public. */}
       <BeforeAfterSlider
         className="my-6"
         aspect={1429 / 618}
@@ -202,7 +216,6 @@ export default function Page() {
         }}
       />
 
-
       <h2 className={`mt-4 ${type.showcaseHeading}`}>
         Rethinking Product Navigation for $200K+ Industrial Systems
       </h2>
@@ -212,13 +225,14 @@ export default function Page() {
       <p className={`mt-3 ${type.body}`}>
       Two audience types arrived at the site:</p>
       <p className={`mt-3 ${type.body}`}>
-      <strong className="text-gray-950 font-medium">1. An engineer who knows what they need</strong>. They want technical specifications, but layers of navigation bog them down.      </p>
+        <strong>1. An engineer who knows what they need</strong>: technical specifications. However, layers of navigation bog them down.
+      </p>
       <figure className="mx-0 mt-3">
         <JourneyChart {...engineerJourney} />
       </figure>
       <hr className="border-t border-gray-400 mt-11 mb-10" />
       <p className={`mt-3 ${type.body}`}>
-          <strong className="text-gray-950 font-medium">2. A new prospective buyer</strong>. They want technical specifications, but layers of navigation bog them down.
+        <strong>2.</strong> An engineer who knows what they need. They’re looking for technical specifications and want to get there efficiently. 
       </p>
       <figure className="mx-0 mt-4">
         <JourneyChart {...newBuyerJourney} />
