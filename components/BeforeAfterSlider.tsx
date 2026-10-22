@@ -34,7 +34,7 @@ type Side = {
 };
 
 const label =
-  "absolute bottom-[2.5cqw] rounded-full border border-white/25 bg-black px-[2.6cqw] py-[1.3cqw] text-[length:max(9px,2.4cqw)] leading-none text-white";
+  "absolute bottom-[2.5cqw] rounded-full border border-white/25 bg-[#444444] px-[2.6cqw] py-[1.3cqw] text-[length:max(9px,2.4cqw)] leading-none text-white";
 
 export function BeforeAfterSlider({
   before,
