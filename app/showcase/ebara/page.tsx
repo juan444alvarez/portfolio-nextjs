@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ShowcaseShell } from "@/components/Shell";
+import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { ExternalLink, ReturnArrow } from "@/components/icons";
 import { backButton, link, type } from "@/components/tokens";
 
@@ -186,19 +186,20 @@ export default function Page() {
         I researched the problem and redesigned the navigation as a mega menu focused on progressive reveal.
       </p>
 
-      {/* Fixed aspect + object-cover so a differently-proportioned file crops
-          instead of pushing the text around. priority: this is the
-          largest-contentful-paint element for anyone landing here directly. */}
-      <div className="border-overlay relative my-6 aspect-2/1 w-full overflow-hidden rounded-sm bg-neutral-200">
-        <Image
-          src="/ebara-preview.png"
-          alt="The redesigned Ebara product navigation, with the mega menu open across category, family and model"
-          fill
-          sizes="480px"
-          className="object-cover"
-          priority
-        />
-      </div>
+      {/* Before sits under After. Drag the pill to wipe between them. Both files
+          live in /public and should be 2:1 so nothing gets cropped. */}
+      <BeforeAfterSlider
+        className="my-6"
+        sizes="480px"
+        before={{
+          src: "/ebara-before.png",
+          alt: "The original Ebara product navigation, with category, family and model each on a separate page",
+        }}
+        after={{
+          src: "/ebara-preview.png",
+          alt: "The redesigned Ebara product navigation, with the mega menu open across category, family and model",
+        }}
+      />
 
       <h2 className={`mt-4 ${type.showcaseHeading}`}>
         Rethinking Product Navigation for $200K+ Industrial Systems
