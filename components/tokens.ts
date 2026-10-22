@@ -34,6 +34,7 @@ export const link =
   "text-accent underline-offset-4 decoration-1 hover:underline focus-visible:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 /* The icon-only "back to home" link at the top of each showcase. 32px hit
-   area; the negative margin lines the icon itself up with the text below. */
+   area; the negative margin lines the icon itself up with the text below.
+   On hover a 1px line appears under the arrow, standing in for an underline. */
 export const backButton =
-  "-ml-2 inline-flex h-8 w-8 items-center justify-center rounded-sm text-accent transition-transform duration-200 hover:-translate-x-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "relative -ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-neutral-200 text-accent after:absolute after:bottom-1 after:left-1/2 after:h-px after:w-3.5 after:-translate-x-1/2 after:bg-current after:opacity-0 hover:after:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";

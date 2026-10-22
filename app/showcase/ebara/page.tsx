@@ -169,23 +169,25 @@ function JourneyChart({
 export default function Page() {
   return (
     <ShowcaseShell>
-      <Link href="/" aria-label="Home" className={backButton}>
-        <ReturnArrow className="mr-0.5 h-5 w-5" />
-      </Link>
+      <div className="flex items-center gap-2">
+<Link href="/" aria-label="Home" className={`${backButton} size-10! relative after:absolute after:bottom-[9px] after:left-1/2 after:h-[0.5px]! after:w-4 after:-translate-x-1/2 after:bg-current after:opacity-0 hover:after:opacity-100`}>
+  <ReturnArrow className="h-4 w-4" strokeWidth={50} />
+</Link>
+  <a
+    href="https://ebaratech.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-1.5 rounded-full bg-neutral-200 px-4 py-2 text-md leading-5 text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+  >
+    ebaratech.com
+    <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
+    <span className="sr-only">(opens in a new tab)</span>
+  </a>
+</div>
 
       <h1 className={`mt-4 ${type.showcaseName}`}>
         Untangling information architecture through end-to-end UX research
       </h1>
-            <a
-        href="https://ebaratech.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="my-4 flex w-fit items-center gap-1.5 rounded-full bg-neutral-200 px-3 py-1 text-sm leading-5 text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
-      >
-        ebaratech.com
-        <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
-        <span className="sr-only">(opens in a new tab)</span>
-      </a>
 
       <p className={`mt-3 ${type.body}`}>
         With an extensive product catalog, finding specific products took several steps. Visitors clicked through a category page, then a product family, and finally... the product.
