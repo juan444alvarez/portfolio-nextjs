@@ -190,16 +190,18 @@ export default function Page() {
           live in /public and should be 2:1 so nothing gets cropped. */}
       <BeforeAfterSlider
         className="my-6"
+        aspect={1429 / 618}
         sizes="480px"
         before={{
-          src: "/ebara-before.png",
-          alt: "The original Ebara product navigation, with category, family and model each on a separate page",
+          src: "/ebara-before.webp",
+          alt: "The original Ebara product navigation: a wide menu listing every dry pump, abatement and turbomolecular model at once",
         }}
         after={{
-          src: "/ebara-preview.png",
+          src: "/ebara-after.webp",
           alt: "The redesigned Ebara product navigation, with the mega menu open across category, family and model",
         }}
       />
+
 
       <h2 className={`mt-4 ${type.showcaseHeading}`}>
         Rethinking Product Navigation for $200K+ Industrial Systems
@@ -210,14 +212,13 @@ export default function Page() {
       <p className={`mt-3 ${type.body}`}>
       Two audience types arrived at the site:</p>
       <p className={`mt-3 ${type.body}`}>
-        <strong>1. An engineer who knows what they need</strong>: technical specifications. However, layers of navigation bog them down.
-      </p>
+      <strong className="text-gray-950 font-medium">1. An engineer who knows what they need</strong>. They want technical specifications, but layers of navigation bog them down.      </p>
       <figure className="mx-0 mt-3">
         <JourneyChart {...engineerJourney} />
       </figure>
       <hr className="border-t border-gray-400 mt-11 mb-10" />
       <p className={`mt-3 ${type.body}`}>
-        <strong>2.</strong> An engineer who knows what they need. They’re looking for technical specifications and want to get there efficiently. 
+          <strong className="text-gray-950 font-medium">2. A new prospective buyer</strong>. They want technical specifications, but layers of navigation bog them down.
       </p>
       <figure className="mx-0 mt-4">
         <JourneyChart {...newBuyerJourney} />

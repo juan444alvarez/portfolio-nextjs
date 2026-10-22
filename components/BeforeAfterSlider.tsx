@@ -21,10 +21,17 @@ import type { KeyboardEvent, PointerEvent } from "react";
    either side, so each image can be shown in full. When only part of the line
    is inside the box, the handle rides the middle of that part.
 
-   Both images should match the box's aspect ratio (2:1 by default); anything
-   else is cropped by object-cover. */
+   Images of different sizes: set `aspect` to the box you want (the page uses
+   the After screenshot's own ratio so it shows in full). Any image with a
+   different ratio is scaled to fill the box width and cropped by object-cover,
+   anchored to `position` (top by default, so only the bottom is trimmed). */
 
-type Side = { src: string; alt: string };
+type Side = {
+  src: string;
+  alt: string;
+  /** CSS object-position for the crop, e.g. "top", "center", "left top" */
+  position?: string;
+};
 
 const label =
   "absolute bottom-[2.5cqw] rounded-full border border-white/25 bg-black px-[2.6cqw] py-[1.3cqw] text-[length:max(9px,2.4cqw)] leading-none text-white";
@@ -40,7 +47,7 @@ export function BeforeAfterSlider({
 }: {
   before: Side;
   after: Side;
-  /** width / height of the box */
+  /** width / height of the box (default 2, i.e. 2:1) */
   aspect?: number;
   sizes?: string;
   /** starting position, 0 to 100 */
@@ -114,6 +121,7 @@ export function BeforeAfterSlider({
         sizes={sizes}
         draggable={false}
         className="object-cover"
+        style={{ objectPosition: before.position ?? "top" }}
         priority
       />
       <span aria-hidden="true" className={`${label} left-[2.5cqw]`}>
@@ -121,7 +129,7 @@ export function BeforeAfterSlider({
       </span>
 
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 bg-white"
         style={{
           clipPath: `polygon(${top}% 0, 100% 0, 100% 100%, ${bottom}% 100%)`,
         }}
@@ -133,6 +141,7 @@ export function BeforeAfterSlider({
           sizes={sizes}
           draggable={false}
           className="object-cover"
+          style={{ objectPosition: after.position ?? "top" }}
           priority
         />
         <span aria-hidden="true" className={`${label} right-[2.5cqw]`}>
