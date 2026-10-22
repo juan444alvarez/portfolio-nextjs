@@ -69,6 +69,12 @@ body {
   animation: none;
 }
 
+/* Hide the outgoing page's leftovers (the hover lines live on <body>, outside
+   the animated <main>), so only black shows behind the transition. */
+::view-transition-old(root) {
+  display: none;
+}
+
 /* The incoming showcase slides up over the outgoing home page, so it needs
    to paint on top. Separate groups don't guarantee that on their own. */
 ::view-transition-group(.home-exit) {
