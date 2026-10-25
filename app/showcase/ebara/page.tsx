@@ -29,7 +29,7 @@ const engineerJourney = {
   fill: "M-20 250 L-20 223 L0 200 C35 160 95 60 150 60 C190 60 226 108 258 134 C286 157 308 170 336 174 C364 178 392 197 420 198 L480 201 L500 202 L500 250 Z",
   points: [
     { x: 31.25, y: 24, pill: "Focused" },
-    { x: 53.75, y: 53.6, label: ["Catalog follows", "business segments"], lift: 11.5 },
+    { x: 53.75, y: 53.6, label: ["Specs are buried", "levels deep"], lift: 11.5 },
     { x: 70, y: 69.6, label: ["A page reload", "at every level"] },
     { x: 87.5, y: 79.2, pill: "Frustrated" },
   ] satisfies Point[],
@@ -190,14 +190,19 @@ export default function Page() {
       </h1>
 
       <p className={`mt-3 ${type.body}`}>
-        With an extensive product catalog, finding specific products took several steps. Visitors clicked through a category page, then a product family, and finally... the product.
-      </p>
-      <p className={`mt-3 ${type.body}`}>
-        Each click caused a full page reload.
-      </p>
-      <p className={`mt-3 ${type.body}`}>
-        I researched the problem and redesigned the navigation as a mega menu focused on progressive reveal.
-      </p>
+  I researched and redesigned navigation for an extensive product catalog.
+  Finding a specific product meant clicking through a category page, then a
+  product family, and finally... the product (with a full page reload at every
+  step.)
+</p>
+<p className={`mt-3 ${type.body}`}>
+  So I designed a mega menu with progressive reveal, putting every level in one
+  view and{" "}
+  <span className="font-semibold">
+    cut the average time to find a product by ~40%
+  </span>
+  .
+</p>
 
       {/* Before sits under After. Drag the handle to wipe between them. The
           screenshots are different sizes, so the box takes the After ratio
@@ -227,14 +232,14 @@ export default function Page() {
       <p className={`mt-3 ${type.body}`}>
       Two audience types arrived at the site:</p>
       <p className={`mt-3 ${type.body}`}>
-        <strong>1. An engineer who knows what they need</strong>: technical specifications. However, layers of navigation bog them down.
+        <strong>1. An engineer who knows what they need</strong>. They want technical specifications, but layers of navigation bog them down.
       </p>
       <figure className="mx-0 mt-3">
         <JourneyChart {...engineerJourney} />
       </figure>
       <hr className="border-t border-gray-400 mt-11 mb-10" />
-      <p className={`mt-3 ${type.body}`}>
-        <strong>2.</strong> An engineer who knows what they need. They’re looking for technical specifications and want to get there efficiently. 
+      <p className={`mt-3 -mb-8 ${type.body}`}>
+        <strong>2. A prospective buyer browsing the site</strong>. Unsure where to look, they get confused and leave the site.
       </p>
       <figure className="mx-0 mt-4">
         <JourneyChart {...newBuyerJourney} />

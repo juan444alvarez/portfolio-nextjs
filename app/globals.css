@@ -6,7 +6,7 @@
   --background: #f5f5f5;
 
   /* Link blue. 7.29:1 on --background — clears AA and AAA for body text. */
-  --accent: #0b31a4;
+  --accent: #0532ba;
 }
 
 /* stylelint-disable-next-line at-rule-no-unknown */
@@ -20,7 +20,7 @@
    through and around the outgoing page during the transition below. Without
    it the motion reads flat. Every <main> carries bg-background to cover it. */
 body {
-  background: #000000;
+  background: #111111;
 }
 
 /* A 1px edge at 10% black so pale screenshots don't dissolve into the page.
