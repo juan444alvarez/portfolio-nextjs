@@ -192,14 +192,13 @@ export default function Page() {
       <p className={`mt-3 ${type.body}`}>
   I researched and redesigned navigation for an extensive product catalog.
   Finding a specific product meant clicking through a category page, then a
-  product family, and finally... the product (with a full page reload at every
-  step.)
+  product family, and finally... the product.
 </p>
 <p className={`mt-3 ${type.body}`}>
-  So I designed a mega menu with progressive reveal, putting every level in one
+  So, I designed a mega menu with progressive reveal, putting every level in one
   view and{" "}
   <span className="font-semibold">
-    cut the average time to find a product by ~40%
+    cut the average findability time by ~40%
   </span>
   .
 </p>
