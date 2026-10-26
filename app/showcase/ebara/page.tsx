@@ -247,6 +247,8 @@ export default function Page() {
       <h3 className={`mt-4 ${type.showcaseHeadingSecondary}`}>
         Measuring Effort over Speed
       </h3>
+            <p>My hypothesis was that full page reloads at every click were holding both groups back. To validate it, I ran usability tests.</p>
+
       <h3 className={`mt-4 ${type.showcaseHeadingSecondary}`}>Results</h3>
       <ul className={`mt-3 list-disc pl-5 ${type.body}`}>
         <li>Average time to find a product was cut by ~40%</li>
