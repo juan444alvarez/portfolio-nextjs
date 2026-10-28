@@ -243,11 +243,35 @@ export default function Page() {
       <figure className="mx-0 mt-4">
         <JourneyChart {...newBuyerJourney} />
       </figure>
+      <p className={`mt-13 ${type.body}`}>
+        Despite their different levels of knowledge, both groups face the same problem: too many steps between them and the product.
+      </p>
 
+      <h3 className={`mt-4 ${type.showcaseHeadingSecondary}`}>
+        Forming Hypotheses
+      </h3>
+      <p className={`mt-3 ${type.body}`}>
+        My primary hypothesis was that collapsing the catalog's hierarchy into a single view would help both groups find products more easily. I took a user-centric approach to click rate optimization, aiming to make each click count instead of adding more.
+      </p>
+      <p className={`mt-3 ${type.body}`}>
+        My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front end by revealing each level in place.      </p>
       <h3 className={`mt-4 ${type.showcaseHeadingSecondary}`}>
         Measuring Effort over Speed
       </h3>
-            <p>My hypothesis was that full page reloads at every click were holding both groups back. To validate it, I ran usability tests.</p>
+      <p className={`mt-3 ${type.body}`}>
+        To validate my hypothesis, I needed usability testing but lacked access to external end-users. I solved this by recruiting internal employees into audience-matched cohorts, using outreach to gauge website and product familiarity. 
+      </p>
+      <p className={`mt-3 ${type.body}`}>
+        Respondents on the lower end of the spectrum served as proxies for prospective buyers, while those on the higher end represented engineers. Once cohorts were set, I ran usability testing in two phases:
+      </p>
+      <ul className={`mt-3 list-disc pl-5 ${type.body}`}>
+        <li>
+          Round 1: Tested paper prototypes of my proposed navigation against the legacy structure with a small group, isolating logic from visual design bias.
+        </li>
+        <li>
+          Round 2: Conducted A/B testing utilizing a high-fidelity prototype against the live legacy website with a larger group to validate the updated design choices.
+        </li>
+      </ul>
 
       <h3 className={`mt-4 ${type.showcaseHeadingSecondary}`}>Results</h3>
       <ul className={`mt-3 list-disc pl-5 ${type.body}`}>
@@ -255,6 +279,9 @@ export default function Page() {
         <li>
           Users could bypass intermediate pages entirely, which reduced
           cognitive load and helped visitors on slower connections
+        </li>
+        <li>
+          Including senior managers in usability testing meant they saw the results firsthand, which secured buy-in without a separate presentation.
         </li>
       </ul>
       <p className={`mt-3 ${type.body}`}>
