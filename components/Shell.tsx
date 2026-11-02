@@ -20,7 +20,23 @@ export const SHOWCASE_TRANSITION: string[] = ["showcase"];
 
 const MAIN = "min-h-dvh bg-background px-6 py-16";
 
-/** Home: 388px, vertically centred. A card you land on.
+/* Showcase grid: a 492px reading column (`content`, the old max-w-123) with
+   empty tracks either side, so a block can widen into `wide` without leaving
+   MAIN's px-6 gutter. */
+const SHOWCASE_COLUMNS =
+  "[wide-start] minmax(0, 1fr) [content-start] min(100%, 30.75rem) [content-end] minmax(0, 1fr) [wide-end]";
+
+/* How wide a <Breakout> can get, in px. Change this one number to make the
+   slider (or anything else in a Breakout) bigger or smaller: 768, 896, 1024 …
+   Anything at or below 492 is no wider than the text column. */
+const BREAKOUT_MAX = 642;
+
+/* `sizes` for any next/image inside <Breakout>, worked out from BREAKOUT_MAX
+   and MAIN's px-6 (24px a side, so 48px total): once the window is wide
+   enough the image is BREAKOUT_MAX wide; below that it fills the gutter. */
+export const BREAKOUT_SIZES = `(min-width: ${BREAKOUT_MAX + 48}px) ${BREAKOUT_MAX}px, calc(100vw - 48px)`;
+
+/** Home: 400px, vertically centred. A card you land on.
     The column is what the hover lines steer around (data-hover-lines-avoid).
     relative z-10 keeps it above the lines if HoverLines' layer is "behind". */
 export function HomeShell({ children }: { children: ReactNode }) {
@@ -39,7 +55,9 @@ export function HomeShell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Showcase: 480px, top-aligned. A document you read down. */
+/** Showcase: 492px reading column, top-aligned. A document you read down.
+    Every direct child sits in the `content` column (*:col-[content]);
+    wrap one in <Breakout> to let it span the wider `wide` column. */
 export function ShowcaseShell({ children }: { children: ReactNode }) {
   return (
     <ViewTransition
@@ -47,8 +65,35 @@ export function ShowcaseShell({ children }: { children: ReactNode }) {
       default="none"
     >
       <main className={MAIN}>
-        <div className="mx-auto w-full max-w-123">{children}</div>
+        <div
+          className="grid *:col-[content]"
+          style={{ gridTemplateColumns: SHOWCASE_COLUMNS }}
+        >
+          {children}
+        </div>
       </main>
     </ViewTransition>
+  );
+}
+
+/** Lets one block of a showcase grow past the reading column: up to
+    BREAKOUT_MAX, centred, never into the page gutter. It must be a DIRECT
+    child of ShowcaseShell — the grid can't reach anything nested inside a
+    <section>. gridColumn is an inline style so it beats the parent's
+    *:col-[content]. Pair any image inside it with sizes={BREAKOUT_SIZES}. */
+export function Breakout({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`w-full justify-self-center ${className}`}
+      style={{ gridColumn: "wide", maxWidth: BREAKOUT_MAX }}
+    >
+      {children}
+    </div>
   );
 }

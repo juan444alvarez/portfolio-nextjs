@@ -1,12 +1,18 @@
-import Link from "next/link";
-import { ShowcaseShell } from "@/components/Shell";
+import { Breakout, BREAKOUT_SIZES, ShowcaseShell } from "@/components/Shell";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
-import { ExternalLink, ReturnArrow } from "@/components/icons";
-import { backButton, link, type } from "@/components/tokens";
+import { BackButton, SiteButton } from "@/components/icons";
+import { type } from "@/components/tokens";
 
 /* The fullest showcase: back link, title, an external link, a hero image and
    one section. calpers/ and veeva/ are the same shape without the extras.
-   To add a section, copy the <section> block at the bottom. */
+   To add a section, copy the <section> block at the bottom.
+
+   ShowcaseShell is a grid, so every top-level element here sits in the 492px
+   reading column. Wrap one in <Breakout> to let it widen to 1024px. Two
+   consequences of the grid:
+   - Breakout only works on top-level elements, not inside a wrapper.
+   - Vertical margins between top-level elements ADD instead of collapsing
+     (mb-10 then mt-3 is 52px, not 40px). Put the whole gap on one side. */
 
 export const metadata = { title: "Ebara Technologies" };
 
@@ -169,67 +175,62 @@ function JourneyChart({
 export default function Page() {
   return (
     <ShowcaseShell>
+      {/* Both buttons are styled in components/icons.tsx. */}
       <div className="flex items-center gap-2">
-<Link href="/" aria-label="Home" className={`${backButton} size-10! relative after:absolute after:bottom-[9px] after:left-1/2 after:h-[0.5px]! after:w-4 after:-translate-x-1/2 after:bg-current after:opacity-0 hover:after:opacity-100`}>
-  <ReturnArrow className="h-4 w-4" strokeWidth={50} />
-</Link>
-  <a
-    href="https://ebaratech.com"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center gap-1.5 rounded-full bg-neutral-200 px-4 py-2 text-md leading-5 text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
-  >
-    ebaratech.com
-    <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
-    <span className="sr-only">(opens in a new tab)</span>
-  </a>
-</div>
+        <BackButton />
+        <SiteButton href="https://ebaratech.com">ebaratech.com</SiteButton>
+      </div>
 
       <h1 className={`mt-4 ${type.showcaseName}`}>
         Untangling information architecture through end-to-end UX research
       </h1>
 
       <p className={`mt-3 ${type.body}`}>
-  I researched and redesigned navigation for an extensive product catalog.
-  Finding a specific product meant clicking through a category page, then a
-  product family, and finally... the product.
-</p>
-<p className={`mt-3 ${type.body}`}>
-  So, I designed a mega menu with progressive reveal, putting every level in one
-  view and{" "}
-  <span className="font-semibold">
-    cut the average findability time by ~40%
-  </span>
-  .
-</p>
+        I researched and redesigned navigation for an extensive product catalog.
+        Finding a specific product meant clicking through a category page, then a
+        product family, and finally... the product.
+      </p>
+      <p className={`mt-3 ${type.body}`}>
+        So, I designed a mega menu with progressive reveal, putting every level in one
+        view and{" "}
+        <span className="font-semibold">
+          cut the average findability time by ~40%
+        </span>
+        .
+      </p>
 
       {/* Before sits under After. Drag the handle to wipe between them. The
           screenshots are different sizes, so the box takes the After ratio
           (1429 x 618) and shows it whole; Before (1424 x 766) is scaled to the
           same width and trimmed at the bottom, where its menu runs off anyway.
-          Both files live in /public. */}
-      <BeforeAfterSlider
-        className="my-6"
-        aspect={1429 / 618}
-        sizes="480px"
-        before={{
-          src: "/ebara-before.webp",
-          alt: "The original Ebara product navigation: a wide menu listing every dry pump, abatement and turbomolecular model at once",
-        }}
-        after={{
-          src: "/ebara-after.webp",
-          alt: "The redesigned Ebara product navigation, with the mega menu open across category, family and model",
-        }}
-      />
+          Both files live in /public.
+
+          Breakout widens it to 1024px. mt-6 mb-2 + the h2's mt-4 keeps the
+          old 24px gap either side (margins add in the grid, see top). */}
+      <Breakout className="mt-6 mb-2">
+        <BeforeAfterSlider
+          aspect={1429 / 618}
+          sizes={BREAKOUT_SIZES}
+          before={{
+            src: "/ebara-before.webp",
+            alt: "The original Ebara product navigation: a wide menu listing every dry pump, abatement and turbomolecular model at once",
+          }}
+          after={{
+            src: "/ebara-after.webp",
+            alt: "The redesigned Ebara product navigation, with the mega menu open across category, family and model",
+          }}
+        />
+      </Breakout>
 
       <h2 className={`mt-4 ${type.showcaseHeading}`}>
         Rethinking Product Navigation for $200K+ Industrial Systems
       </h2>
       <p className={`mt-3 ${type.body}`}>
-      Nobody adds a $200K+ machine to a cart, so my focus wasn't on a checkout flow. My goal was to get the right person to the right product. But “the right person” wasn’t one person.
+        Nobody adds a $200K+ machine to a cart, so my focus wasn't on a checkout flow. My goal was to get the right person to the right product. But “the right person” wasn’t one person.
       </p>
       <p className={`mt-3 ${type.body}`}>
-      Two audience types arrived at the site:</p>
+        Two audience types arrived at the site:
+      </p>
       <p className={`mt-3 ${type.body}`}>
         <strong>1. An engineer who knows what they need</strong>. They want technical specifications, but layers of navigation bog them down.
       </p>
@@ -237,7 +238,8 @@ export default function Page() {
         <JourneyChart {...engineerJourney} />
       </figure>
       <hr className="border-t border-gray-400 mt-11 mb-10" />
-      <p className={`mt-3 -mb-8 ${type.body}`}>
+      {/* mt-0, not mt-3: the hr's mb-10 is the whole gap now that margins add. */}
+      <p className={`mt-0 -mb-8 ${type.body}`}>
         <strong>2. A prospective buyer browsing the site</strong>. Unsure where to look, they get confused and leave the site.
       </p>
       <figure className="mx-0 mt-4">
@@ -254,12 +256,13 @@ export default function Page() {
         My primary hypothesis was that collapsing the catalog's hierarchy into a single view would help both groups find products more easily. I took a user-centric approach to click rate optimization, aiming to make each click count instead of adding more.
       </p>
       <p className={`mt-3 ${type.body}`}>
-        My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front end by revealing each level in place.      </p>
+        My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front end by revealing each level in place.
+      </p>
       <h3 className={`mt-4 ${type.showcaseHeadingSecondary}`}>
         Measuring Effort over Speed
       </h3>
       <p className={`mt-3 ${type.body}`}>
-        To validate my hypothesis, I needed usability testing but lacked access to external end-users. I solved this by recruiting internal employees into audience-matched cohorts, using outreach to gauge website and product familiarity. 
+        To validate my hypothesis, I needed usability testing but lacked access to external end-users. I solved this by recruiting internal employees into audience-matched cohorts, using outreach to gauge website and product familiarity.
       </p>
       <p className={`mt-3 ${type.body}`}>
         Respondents on the lower end of the spectrum served as proxies for prospective buyers, while those on the higher end represented engineers. Once cohorts were set, I ran usability testing in two phases:
