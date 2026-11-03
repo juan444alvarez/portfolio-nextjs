@@ -174,7 +174,7 @@ function JourneyChart({
 
 export default function Page() {
   return (
-    <ShowcaseShell>
+      <ShowcaseShell contentWidth={550}>
       {/* Both buttons are styled in components/icons.tsx. */}
       <div className="flex items-center gap-2">
         <BackButton />

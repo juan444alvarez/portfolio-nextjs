@@ -20,16 +20,19 @@ export const SHOWCASE_TRANSITION: string[] = ["showcase"];
 
 const MAIN = "min-h-dvh bg-background px-6 py-16";
 
-/* Showcase grid: a 492px reading column (`content`, the old max-w-123) with
-   empty tracks either side, so a block can widen into `wide` without leaving
-   MAIN's px-6 gutter. */
-const SHOWCASE_COLUMNS =
-  "[wide-start] minmax(0, 1fr) [content-start] min(100%, 30.75rem) [content-end] minmax(0, 1fr) [wide-end]";
+/* Showcase grid: a reading column (`content`) with empty tracks either side,
+   so a block can widen into `wide` without leaving MAIN's px-6 gutter.
+   The reading column is 492px (the old max-w-123) unless a page passes
+   contentWidth to ShowcaseShell. Past ~680px lines get long to read. */
+const CONTENT_WIDTH = 492;
+const showcaseColumns = (contentWidth: number) =>
+  `[wide-start] minmax(0, 1fr) [content-start] min(100%, ${contentWidth}px) [content-end] minmax(0, 1fr) [wide-end]`;
 
 /* How wide a <Breakout> can get, in px. Change this one number to make the
    slider (or anything else in a Breakout) bigger or smaller: 768, 896, 1024 …
-   Anything at or below 492 is no wider than the text column. */
-const BREAKOUT_MAX = 642;
+   Keep it bigger than the page's reading column, or the Breakout is no
+   wider than the text. */
+const BREAKOUT_MAX = 668;
 
 /* `sizes` for any next/image inside <Breakout>, worked out from BREAKOUT_MAX
    and MAIN's px-6 (24px a side, so 48px total): once the window is wide
@@ -55,10 +58,17 @@ export function HomeShell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Showcase: 492px reading column, top-aligned. A document you read down.
+/** Showcase: a reading column, top-aligned. A document you read down.
     Every direct child sits in the `content` column (*:col-[content]);
-    wrap one in <Breakout> to let it span the wider `wide` column. */
-export function ShowcaseShell({ children }: { children: ReactNode }) {
+    wrap one in <Breakout> to let it span the wider `wide` column.
+    contentWidth (px) widens the reading column for one page, e.g. 600. */
+export function ShowcaseShell({
+  children,
+  contentWidth = CONTENT_WIDTH,
+}: {
+  children: ReactNode;
+  contentWidth?: number;
+}) {
   return (
     <ViewTransition
       enter={{ showcase: "showcase-enter", default: "none" }}
@@ -67,7 +77,7 @@ export function ShowcaseShell({ children }: { children: ReactNode }) {
       <main className={MAIN}>
         <div
           className="grid *:col-[content]"
-          style={{ gridTemplateColumns: SHOWCASE_COLUMNS }}
+          style={{ gridTemplateColumns: showcaseColumns(contentWidth) }}
         >
           {children}
         </div>
