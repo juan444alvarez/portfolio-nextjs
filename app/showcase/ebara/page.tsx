@@ -226,10 +226,13 @@ export default function Page() {
         Rethinking Product Navigation for $200K+ Industrial Systems
       </h2>
       <p className={`mt-3 ${type.body}`}>
-        Nobody adds a $200K+ machine to a cart, so my focus wasn't on a checkout flow. My goal was to get the right person to the right product. But “the right person” wasn’t one person.
+        Most people have never bought anything this expensive online. Even cars, which cost a fraction of this, rarely end with “add to cart.”
       </p>
       <p className={`mt-3 ${type.body}`}>
-        Two audience types arrived at the site:
+        So, I wasn’t designing for a checkout. I was trying to understand who was looking, and what they were looking for.
+      </p>
+      <p className={`mt-3 ${type.body}`}>
+        I started with the site analytics to understand navigation paths. Then I talked with managers to learn who those people were and what brought them there. The data and conversations pointed towards two audiences:
       </p>
       <p className={`mt-3 ${type.body}`}>
         <strong>1. An engineer who knows what they need</strong>. They want technical specifications, but layers of navigation bog them down.
