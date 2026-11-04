@@ -232,7 +232,7 @@ export default function Page() {
         So, I wasn’t designing for a checkout. I was trying to understand who was looking, and what they were looking for.
       </p>
       <p className={`mt-3 ${type.body}`}>
-        I started with the site analytics to understand navigation paths. Then I interviewed managers to define the target audience. The data and conversations pointed towards two audiences:
+        I started with the site analytics to understand navigation paths. Then I interviewed managers to define the target audience. The data and conversations pointed towards two audience(s):
       </p>
       <p className={`mt-3 ${type.body}`}>
         <strong>1. An engineer who knows what they need</strong>. They want technical specifications, but layers of navigation bog them down.
