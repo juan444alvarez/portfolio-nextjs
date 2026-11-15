@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
-/* Nothing needed for the showcase transition: view transitions work in the
-   App Router with no configuration (Next.js 16.2+). */
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  /* config options here */
+  experimental: {
+    agentFeedback: true,
+  },
+  cacheComponents: true,
+  partialPrefetching: true,
+  turbopack: {
+    rules: {
+      "*.css": {
+        loaders: ["@tailwindcss/turbopack"],
+        as: "*.css",
+      },
+    },
+  },
+};
 
 export default nextConfig;
