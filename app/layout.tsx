@@ -3,7 +3,7 @@ import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"] });
 
-export const metadata = { title: "2027 Portfolio" };
+export const metadata = { title: "Juan Alvarez Portfolio" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
