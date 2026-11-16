@@ -110,35 +110,52 @@ function JourneyChart({
 export default function Home() {
   return (
     <div className="">
-        <div className="mx-auto w-full max-w-[570px] text-pretty">
+        <div className="mx-auto w-full max-w-[540px] text-pretty">
           <h1 className="max-w-[36ch] text-[22px] font-semibold tracking-tight leading-snug text-balance mb-3">
             Rethinking Product Navigation for $250K+ Industrial Systems
           </h1>
           <p className="text-lg mb-3">At this price point, people approach purchasing differently than in a typical e-commerce experience.</p>
           <p className="text-lg mb-3">
-            Most of us have never bought anything this expensive online, so my work started with one question:{" "}
-            <em>how should navigation work in a catalog like this?</em>
+            Most of us have never bought anything this expensive online, so my work began with one question:{" "}
+            <em>how should navigation work for a purchase like this?</em>
           </p>
           <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Untangling choice architecture through end-to-end UX research</h2>
-            <p className="text-lg mb-3">I started with the site analytics to understand navigation paths. Then I interviewed managers to define the target audience.</p>
-
-
+            <p className="text-lg mb-3">I opened by tracing user journeys and drop-off points through Google Analytics, then interviewed stakeholders (senior leadership and sales reps) to learn who we were designing for.</p>
+            <p className="text-lg mb-3">The data and conversations pointed toward two audiences:</p>
           <p className="text-lg mb-3">
-            <strong>1. An engineer who knows what they need</strong>. They want technical
-            specifications, but layers of navigation bog them down.
-          </p>
+  <span className="font-semibold">1. Engineers who know what they need</span>. They’re looking for technical specifications, but layers of navigation bog them down.</p>
           <figure className="mx-0 mb-10">
             <JourneyChart {...engineerJourney} />
           </figure>
 
           <p className="text-lg mb-3">
-            <strong>2. A prospective buyer browsing the site</strong>. Unsure where to
-            look, they get confused and leave the site.
-          </p>
+  <span className="font-semibold">2. Visitors exploring what they need</span>. They’re looking for smaller accessory purchases, but a tangle of choices confuses them.</p>
           <figure className="mx-0 mb-10">
             <JourneyChart {...newBuyerJourney} />
           </figure>
-        </div>
+          <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors secondary. Despite having different levels of knowledge, both were nudged to leave before finding what they came for.</p>
+          <p className="text-lg mb-3">Thinking inversely, the design opportunity was to nudge them forward by reducing the number of options and pacing decisions across sequential steps.</p>
+
+          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Forming Hypotheses</h2>
+          <p className="text-lg mb-3">My primary hypothesis was that collapsing the catalog’s hierarchy into a single view would help both audiences find products more easily. I took a user-centric approach to click rate optimization, aiming to make each click count instead of adding more.</p>
+          <p className="text-lg mb-3">My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front end by revealing each level in place.</p>
+
+          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Measuring Effort over Speed</h2>
+          <p className="text-lg mb-3">To validate my hypotheses, I needed usability testing but lacked access to external end users. I solved this by recruiting internal employees into audience-matched cohorts, using outreach to gauge their familiarity with the website and products.</p>
+          <p className="text-lg mb-3">Respondents on the lower end of the spectrum served as proxies for visitors, while those on the higher end represented engineers. Once the cohorts were set, I ran usability testing in two rounds:</p>
+          <ul className="text-lg mb-3 list-disc pl-6 space-y-1">
+            <li>Round 1: Tested paper prototypes of my proposed navigation against the legacy structure with a small group, isolating the logic from visual design bias.</li>
+            <li>Round 2: Ran A/B tests of a high-fidelity prototype against the live legacy website with a larger group to validate the updated design choices.</li>
+          </ul>
+
+          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Results</h2>
+          <ul className="text-lg mb-3 list-disc pl-6 space-y-1">
+            <li>Average time to find a product was cut by ~40%.</li>
+            <li>Users could bypass intermediate pages entirely, which reduced cognitive load and helped people on slower connections.</li>
+            <li>Including senior managers in usability testing meant they saw the results firsthand, which secured buy-in without a separate presentation.</li>
+          </ul>
+          <p className="text-lg mb-3">Giving people direct access to the information they needed moved them toward a sales conversation on their own terms, serving the business goal without forcing anyone down a funnel.</p>
+          </div>
 
       <footer className="">
         <FlipClock />
