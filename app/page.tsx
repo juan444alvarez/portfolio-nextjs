@@ -139,22 +139,6 @@ export default function Home() {
           <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Forming Hypotheses</h2>
           <p className="text-lg mb-3">My primary hypothesis was that collapsing the catalog’s hierarchy into a single view would help both audiences find products more easily. I took a user-centric approach to click rate optimization, aiming to make each click count instead of adding more.</p>
           <p className="text-lg mb-3">My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front end by revealing each level in place.</p>
-
-          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Measuring Effort over Speed</h2>
-          <p className="text-lg mb-3">To validate my hypotheses, I needed usability testing but lacked access to external end users. I solved this by recruiting internal employees into audience-matched cohorts, using outreach to gauge their familiarity with the website and products.</p>
-          <p className="text-lg mb-3">Respondents on the lower end of the spectrum served as proxies for visitors, while those on the higher end represented engineers. Once the cohorts were set, I ran usability testing in two rounds:</p>
-          <ul className="text-lg mb-3 list-disc pl-6 space-y-1">
-            <li>Round 1: Tested paper prototypes of my proposed navigation against the legacy structure with a small group, isolating the logic from visual design bias.</li>
-            <li>Round 2: Ran A/B tests of a high-fidelity prototype against the live legacy website with a larger group to validate the updated design choices.</li>
-          </ul>
-
-          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Results</h2>
-          <ul className="text-lg mb-3 list-disc pl-6 space-y-1">
-            <li>Average time to find a product was cut by ~40%.</li>
-            <li>Users could bypass intermediate pages entirely, which reduced cognitive load and helped people on slower connections.</li>
-            <li>Including senior managers in usability testing meant they saw the results firsthand, which secured buy-in without a separate presentation.</li>
-          </ul>
-          <p className="text-lg mb-3">Giving people direct access to the information they needed moved them toward a sales conversation on their own terms, serving the business goal without forcing anyone down a funnel.</p>
           </div>
 
       <footer className="">
