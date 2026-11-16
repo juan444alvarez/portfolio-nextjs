@@ -25,8 +25,9 @@ const ticks = Array.from({ length: LAST - FIRST + 1 }, (_, k) => FIRST + k);
 
 // ---- melt ----
 
-// "scroll": melts once the whole clock is on screen. "hover": melts when the pointer reaches it.
+// "scroll": melts once enough of the clock has scrolled into view. "hover": melts when the pointer reaches it.
 const TRIGGER = "scroll" as "scroll" | "hover";
+const REVEAL = 0.5; // share of the clock that must be on screen for the melt to start (0.5 = half)
 const MELT_DELAY = 300; // ms between reaching the clock and the melt starting
 const MELT_MS = 2600; // how long the melt takes to reach full strength
 const ZERO_AT = 900; // ms into the melt at which the time flips to 00:00
@@ -316,9 +317,9 @@ export default function FlipClockRulerCards() {
       if (TRIGGER === "scroll") {
         reach = new IntersectionObserver(
           (entries) => {
-            if (entries.some((entry) => entry.intersectionRatio >= 0.9)) startMelt();
+            if (entries.some((entry) => entry.intersectionRatio >= REVEAL)) startMelt();
           },
-          { threshold: 0.9 }
+          { threshold: REVEAL }
         );
         reach.observe(root);
       }
