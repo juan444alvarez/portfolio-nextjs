@@ -28,13 +28,13 @@ export default function Home() {
         Education Center design system components
       </li>
       <li>
+        <li>
+        Benefit Verification Enhancements
+      </li>
   <Link href="/work/calpers/internal-tool" className="underline">
     Rapid-prototyped internal tool using AI - Deloitte business chemistry framework
   </Link>
 </li>
-      <li>
-        Benefit Verification Enhancements
-      </li>
     </ul>
   </li>
   <li>
