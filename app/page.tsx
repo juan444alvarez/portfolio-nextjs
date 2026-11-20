@@ -7,7 +7,7 @@ import img2 from "../public/image-2.jpeg";
 export default function Home() {
   return (
     <main>
-      <p>about me</p>
+      <p>about me:</p>
       <div className="flex flex-wrap gap-4">
         <Image src={img1} alt="Juan Alvarez" />
         <Image src={img2} alt="" width={img2.width / 6} />
