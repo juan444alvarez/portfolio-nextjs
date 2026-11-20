@@ -1,3 +1,5 @@
+import ChoiceArchitecture from "../../components/ChoiceArchitecture";
+
 type Point =
   | { x: number; y: number; pill: string }
   | { x: number; y: number; label: [string, string]; lift?: number };
@@ -131,12 +133,17 @@ export default function Home() {
           <figure className="mx-0 mb-10">
             <JourneyChart {...newBuyerJourney} />
           </figure>
-          <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors secondary. Despite having different levels of knowledge, both were nudged to leave before finding what they came for.</p>
-          <p className="text-lg mb-3">Thinking inversely, the design opportunity was to nudge them forward by reducing the number of options and pacing decisions across sequential steps.</p>
+          <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors secondary.</p>
+          <p className="text-lg mb-3">Though both arrived with different levels of knowledge, they were nudged away by high interaction costs before finding what they came for.</p>
+          <p className="text-lg mb-3">Thinking inversely, I started from where users dropped off and designed backward, using progressive disclosure to reduce cognitive load.</p>
 
           <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Forming Hypotheses</h2>
-          <p className="text-lg mb-3">My primary hypothesis was that collapsing the catalog’s hierarchy into a single view would help both audiences find products more easily. I took a user-centric approach to click rate optimization, aiming to make each click count instead of adding more.</p>
-          <p className="text-lg mb-3">My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front end by revealing each level in place.</p>
+          <p className="text-lg mb-3">My primary hypothesis was that collapsing the catalog’s hierarchy into a single view would help both audiences find products faster.</p>
+          <p className="text-lg mb-3">My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front-end by revealing each level in place.</p>
+
+          <figure className="mt-5">
+  <ChoiceArchitecture />
+</figure>
           </div>
     </div>
   );

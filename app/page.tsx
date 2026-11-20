@@ -14,7 +14,7 @@ export default function Home() {
         <Image src={img1} alt="Juan Alvarez" />
         <Image src={img2} alt="" width={img2.width / 6} />
         <Image src={img3} alt="" width={img3.width / 2} />
-        <Image src={img4} alt="" width={img4.width } />
+        <Image src={img4} alt="" width={img4.width / 1} />
       </div>
 
       <ul>
