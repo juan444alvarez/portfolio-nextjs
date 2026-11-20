@@ -3,8 +3,6 @@ import Link from "next/link";
 import FlipClock from "./components/FlipClock";
 import img1 from "../public/image-1.jpg";
 import img2 from "../public/image-2.jpeg";
-import img3 from "../public/image-3.jpeg";
-import img4 from "../public/image-4.webp";
 
 export default function Home() {
   return (
@@ -13,8 +11,6 @@ export default function Home() {
       <div className="flex flex-wrap gap-4">
         <Image src={img1} alt="Juan Alvarez" />
         <Image src={img2} alt="" width={img2.width / 6} />
-        <Image src={img3} alt="" width={img3.width / 2} />
-        <Image src={img4} alt="" width={img4.width / 1} />
       </div>
 
       <ul>
