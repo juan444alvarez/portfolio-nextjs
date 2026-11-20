@@ -17,10 +17,37 @@ export default function Home() {
         <Image src={img4} alt="" width={img4.width / 1.5} />
       </div>
 
-      <ul className="underline">
-  <li><Link href="/work/ebara">Ebara Technologies</Link></li>
-  <li><Link href="/work/calpers">CalPERS</Link></li>
-  <li><Link href="/work/veeva">Veeva Systems</Link></li>
+      <ul>
+  <li>
+    <Link href="/work/ebara" className="underline">Ebara Technologies</Link>
+  </li>
+  <li>
+    CalPERS
+    <ul className="mt-2 list-disc space-y-1 pl-5">
+      <li>
+        Wireframed 50+ Education Center pages, extended the existing design system
+      </li>
+      <li>
+  <Link href="/work/calpers/internal-tool" className="underline">
+    Rapid-prototyped internal tool using AI - Deloitte business chemistry framework
+  </Link>
+</li>
+      <li>
+        Analyzed qualitative website survey data, synthesized findings into design
+        recs.
+      </li>
+      <li>
+        Partnered with BAs, devs, stakeholders, etc
+        throughout analysis, design, and validation phases of SDLC
+      </li>
+      <li>
+        Co-launched team design critiques
+      </li>
+    </ul>
+  </li>
+  <li>
+    <Link href="/work/veeva" className="underline">Veeva Systems</Link>
+  </li>
 </ul>
 
       <FlipClock />
