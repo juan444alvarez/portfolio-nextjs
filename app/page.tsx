@@ -25,7 +25,7 @@ export default function Home() {
     CalPERS
     <ul className="mt-2 list-disc space-y-1 pl-5">
       <li>
-        Wireframed 50+ Education Center pages, extended the existing design system
+        Education Center design system components
       </li>
       <li>
   <Link href="/work/calpers/internal-tool" className="underline">
@@ -33,15 +33,7 @@ export default function Home() {
   </Link>
 </li>
       <li>
-        Analyzed qualitative website survey data, synthesized findings into design
-        recs.
-      </li>
-      <li>
-        Partnered with BAs, devs, stakeholders, etc
-        throughout analysis, design, and validation phases of SDLC
-      </li>
-      <li>
-        Co-launched team design critiques
+        Benefit Verification Enhancements
       </li>
     </ul>
   </li>
