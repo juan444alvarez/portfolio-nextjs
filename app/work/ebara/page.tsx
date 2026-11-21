@@ -135,11 +135,16 @@ export default function Home() {
           </figure>
           <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors secondary.</p>
           <p className="text-lg mb-3">Though both arrived with different levels of knowledge, they were nudged away by high interaction costs before finding what they came for.</p>
-          <p className="text-lg mb-3">Thinking inversely, I started from where users dropped off and designed backward, using progressive disclosure to reduce cognitive load.</p>
 
           <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Forming Hypotheses</h2>
-          <p className="text-lg mb-3">My primary hypothesis was that collapsing the catalog’s hierarchy into a single view would help both audiences find products faster.</p>
-          <p className="text-lg mb-3">My secondary hypothesis was technical: every click triggered a full page reload, which I could remove on the front-end by revealing each level in place.</p>
+<p className="text-lg mb-8">Thinking inversely, I started from where users dropped off and designed backward. That led to two hypotheses.</p>
+
+<dl className="mb-8 grid gap-x-6 gap-y-6 border-t border-current/15 pt-6 sm:grid-cols-[9rem_1fr]">
+  <dt className="font-semibold">Findability</dt>
+  <dd className="text-lg opacity-80">Through progressive disclosure, a guided path would lead users to what they need, instead of leaving them to find it alone.</dd>
+  <dt className="font-semibold">Performance</dt>
+  <dd className="text-lg opacity-80">Through a mega menu, each level would open in place, instead of reloading the full page on every click.</dd>
+</dl>
 
           <figure className="mt-5">
   <ChoiceArchitecture />
