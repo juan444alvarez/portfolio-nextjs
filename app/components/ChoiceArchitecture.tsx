@@ -15,7 +15,7 @@ type Flow = {
   color: string;
   dashed: boolean;
   reloads: boolean;
-  title: [string, string];
+  title: string;
   x: number;
   blocks: FlowBlock[];
   time: { value: string; y: number };
@@ -26,7 +26,7 @@ const beforeFlow: Flow = {
   color: "#eebcb6",
   dashed: false,
   reloads: true,
-  title: ["Before", "everything at once"],
+  title: "Before",
   x: 0,
   blocks: [
     { x: 0, y: 32, cols: 8, count: 31, label: ["Menu", "31 options"] },
@@ -41,7 +41,7 @@ const afterFlow: Flow = {
   color: "#a6d878",
   dashed: true,
   reloads: false,
-  title: ["After", "revealed step by step"],
+  title: "After",
   x: 278,
   blocks: [
     { x: 278, y: 32, cols: 9, count: 9, label: ["Menu", "9 options"] },
@@ -139,7 +139,7 @@ function FlowLabels({ flow }: { flow: Flow }) {
         className="absolute -translate-y-1/2 whitespace-nowrap text-[length:max(10px,2.8cqw)] font-medium leading-none"
         style={{ left: caPct(x, CA_W), top: caPct(10, CA_H) }}
       >
-        {title[0]} <span className="font-normal opacity-60">— {title[1]}</span>
+        {title}
       </div>
 
       {blocks.map((b, i) => {
