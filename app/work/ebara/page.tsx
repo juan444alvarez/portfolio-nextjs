@@ -10,10 +10,10 @@ const engineerJourney = {
   line: "M0 200 C35 160 95 60 150 60 C190 60 226 108 258 134 C286 157 308 170 336 174 C364 178 392 197 420 198 L480 201",
   fill: "M-20 250 L-20 223 L0 200 C35 160 95 60 150 60 C190 60 226 108 258 134 C286 157 308 170 336 174 C364 178 392 197 420 198 L480 201 L500 202 L500 250 Z",
   points: [
-    { x: 31.25, y: 24, pill: "Focused" },
-    { x: 53.75, y: 53.6, label: ["Specs are buried", "levels deep"], lift: 11.5 },
-    { x: 70, y: 69.6, label: ["A page reload", "at every level"] },
-    { x: 87.5, y: 79.2, pill: "Frustrated" },
+    { x: 31.25, y: 24, pill: "Purposeful" },
+    { x: 53.75, y: 53.6, label: ["Digs layers deep", "for specs"], lift: 11.5 },
+    { x: 70, y: 69.6, label: ["Every click", "reloads the page"] },
+    { x: 87.5, y: 79.2, pill: "Stalled" },
   ] satisfies Point[],
 };
 
@@ -23,11 +23,11 @@ const newBuyerJourney = {
   line: "M0 190 C30 140 85 100 120 100 C152 100 172 172 205 172 C238 172 268 130 300 130 C340 130 380 205 420 205 L480 207",
   fill: "M-20 250 L-20 214 L0 190 C30 140 85 100 120 100 C152 100 172 172 205 172 C238 172 268 130 300 130 C340 130 380 205 420 205 L480 207 L500 208 L500 250 Z",
   points: [
-    { x: 25, y: 40, pill: "Curious" },
-    { x: 42.7, y: 68.8, label: ["Unsure which", "product line"] },
-    { x: 62.5, y: 52, label: ["Tries another", "category"] },
-    { x: 87.5, y: 82, pill: "Lost" },
-  ] satisfies Point[],
+  { x: 25, y: 40, pill: "Curious" },
+  { x: 42.7, y: 68.8, label: ["Can't tell product", "lines apart"] },
+  { x: 62.5, y: 52, label: ["Thinks they", "found it"] },
+  { x: 87.5, y: 82, pill: "Lost" },
+] satisfies Point[],
 };
 
 function JourneyChart({
@@ -114,27 +114,26 @@ export default function Home() {
           <h1 className="max-w-[36ch] text-[22px] font-semibold tracking-tight leading-snug text-balance mb-3">
             Rethinking Product Navigation for $250K+ Industrial Systems
           </h1>
-          <p className="text-lg mb-3">At this price point, people approach purchasing differently than in a typical e-commerce experience.</p>
           <p className="text-lg mb-3">
             Most of us have never bought anything this expensive online, so my work began with one question:{" "}
             <em>how should navigation work for a purchase like this?</em>
           </p>
-          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Untangling choice architecture through end-to-end UX research</h2>
-            <p className="text-lg mb-3">I opened by tracing user journeys and drop-off points through Google Analytics, then interviewed stakeholders (senior leadership and sales reps) to learn who we were designing for.</p>
-            <p className="text-lg mb-3">The data and conversations pointed toward two audiences:</p>
+          <h2 className="max-w-[30ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Untangling choice architecture through user research</h2>
+            <p className="text-lg mb-3">To answer that, I audited how our navigation presented choices, using site analytics to trace user journeys and drop-off points.</p>
+            <p className="text-lg mb-3">Then I interviewed stakeholders (senior leadership and sales reps) to learn who we were designing for. The data and conversations pointed toward two audiences:</p>
           <p className="text-lg mb-3">
-  <span className="font-semibold">1. Engineers who know what they need</span>. They’re looking for technical specifications, but layers of navigation bog them down.</p>
+  <span className="font-semibold">1. Engineers who know what they need</span>. They’re looking for technical specifications, but layers of navigation stall them.</p>
           <figure className="mx-0 mb-10">
             <JourneyChart {...engineerJourney} />
           </figure>
 
           <p className="text-lg mb-3">
-  <span className="font-semibold">2. Visitors exploring what they need</span>. They’re looking for smaller accessory purchases, but a tangle of choices confuses them.</p>
+  <span className="font-semibold">2. Visitors exploring what they need</span>. They’re looking for smaller accessory purchases, but get lost in a tangle of choices.</p>
           <figure className="mx-0 mb-10">
             <JourneyChart {...newBuyerJourney} />
           </figure>
-          <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors secondary.</p>
-          <p className="text-lg mb-3">Though both arrived with different levels of knowledge, they were nudged away by high interaction costs before finding what they came for.</p>
+          <p className="text-lg mb-3">Though they arrived with different goals, both were nudged away by high interaction costs before finding what they came for.</p>
+          <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors as a close secondary.</p>
 
           <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Forming Hypotheses</h2>
 <p className="text-lg mb-8">Thinking inversely, I started from where users dropped off and designed backward. That led to two hypotheses.</p>
