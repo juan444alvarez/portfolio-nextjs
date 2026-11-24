@@ -6,7 +6,7 @@ import img3 from "../../public/image-3.webp";
 export default function About() {
   return (
     <main>
-      <p>about me:</p>
+      <p>about me: 28yr old interested in design, code, music, and psychology</p>
       <div className="flex flex-wrap gap-4">
         <Image src={img1} alt="Juan Alvarez" />
         <Image src={img2} alt="" width={img2.width / 1.5} />
