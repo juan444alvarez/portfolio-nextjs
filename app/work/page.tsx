@@ -13,9 +13,6 @@ export default function Work() {
             <li>Education Center design system components</li>
             <li>Benefit Verification Enhancements</li>
             <li>
-              <Link href="/work/calpers/internal-tool" className="underline">
-                Rapid-prototyped internal tool using AI - Deloitte business chemistry framework
-              </Link>
             </li>
           </ul>
         </li>
