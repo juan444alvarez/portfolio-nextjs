@@ -111,15 +111,41 @@ export default function Home() {
   return (
     <div className="">
         <div className="mx-auto w-full max-w-[540px] text-pretty">
-          <h1 className="max-w-[36ch] text-[22px] font-semibold tracking-tight leading-snug text-balance mb-3">
+          <h1 className="max-w-[36ch] text-[22px] font-semibold tracking-tight leading-snug text-balance mt-10">
             Rethinking Product Navigation for $250K+ Industrial Systems
           </h1>
+          <ul className="my-4 flex items-start gap-2 text-[15px]">
+          <li>
+            <a
+              href="https://www.ebaratech.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-[30px] items-center gap-1.5 rounded-full border border-current/15 px-3 transition-colors hover:border-current/40"
+            >
+              <span className="opacity-60">Company</span>
+              <span>Ebara Technologies</span>
+              <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 17 17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+          {[
+            ["Role", "Sole Designer"],
+          ].map(([label, value]) => (
+            <li key={label} className="inline-flex h-[30px] items-center gap-1.5 rounded-full border border-current/15 px-3">
+              <span className="opacity-60">{label}</span>
+              <span>{value}</span>
+            </li>
+          ))}
+        </ul>
+        <hr className="my-5 border-current/20" />
           <p className="text-lg mb-3">
             Most of us have never bought anything this expensive online, so my work began with one question:{" "}
             <em>how should navigation work for a purchase like this?</em>
           </p>
-          <h2 className="max-w-[30ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Untangling choice architecture through user research</h2>
-            <p className="text-lg mb-3">To answer that, I audited how our navigation presented choices, using site analytics to trace user journeys and drop-off points.</p>
+          <p className="text-lg mb-3">I opened by auditing how our navigation presented choices, using site analytics to trace user journeys and drop-off points.</p>
             <p className="text-lg mb-3">Then I interviewed stakeholders (senior leadership and sales reps) to learn who we were designing for. The data and conversations pointed toward two audiences:</p>
           <p className="text-lg mb-3">
   <span className="font-semibold">1. Engineers who know what they need</span>. They’re looking for technical specifications, but layers of navigation stall them.</p>
