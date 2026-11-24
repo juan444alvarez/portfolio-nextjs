@@ -10,12 +10,14 @@
  * thicker foam there, then drains away completely, leaving clean sand. The water
  * flows around the links instead of over them.
  *
+ * Sound starts muted. The speaker icon next to the links turns it on.
+ *
  * Everything is procedural: noise-driven foam on a <canvas> character grid, and
  * Web Audio surf synthesized from filtered noise (no assets, no dependencies).
  */
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 
 /* ───────────────────────────── Look ───────────────────────────── */
 
@@ -26,7 +28,6 @@ const RAMPS = ['', ' .-~~≈', ' .·:°o~oO', ' .·:oO0@@', ' .°o'];
 const FOAM_GLOW = 'rgba(170, 225, 255, 0.45)';
 const LINK_COLOR = '#8FAABA';
 const HOVER_COLOR = '#F2FBFF';
-const ICON_COLOR = '#7DB4CE';
 const FONT_STACK = 'ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", monospace';
 
 const LINKS = [
@@ -951,15 +952,15 @@ class SurfAudio {
 }
 
 /* ─────────────────────── Sound preference ─────────────────────── */
-// On at the start of every visit. Muting lasts until the page is reloaded.
+// Muted at the start of every visit; the visitor turns it on with the speaker icon.
 // Kept outside React and read with useSyncExternalStore, so nothing has to copy
 // it into state from an effect.
 
-let soundPref = true;
+let soundPref = false;
 const soundPrefListeners = new Set<() => void>();
 
 const getSoundPref = () => soundPref;
-const getSoundPrefOnServer = () => true;
+const getSoundPrefOnServer = () => false;
 
 function setSoundPref(on: boolean) {
   soundPref = on;
@@ -975,15 +976,11 @@ function subscribeSoundPref(listener: () => void) {
 
 /* ───────────────────────────── Page ───────────────────────────── */
 
-type SoundUi = 'on' | 'off' | 'blocked';
-
 export default function Shoreline() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const idRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const audioRef = useRef<SurfAudio | null>(null);
   const soundOn = useSyncExternalStore(subscribeSoundPref, getSoundPref, getSoundPrefOnServer);
-  const [running, setRunning] = useState(false);
 
   // Sea + render loop
   useEffect(() => {
@@ -1060,40 +1057,25 @@ export default function Shoreline() {
     };
   }, []);
 
-  // Sound: on by default. Browsers hold audio until the first click/tap/key,
-  // so until then the icon pulses and any interaction starts the surf.
+  // Sound: muted until the visitor clicks the speaker icon. That click is also the
+  // user gesture browsers require before a page may play audio.
   useEffect(() => {
     const audio = SurfAudio.create();
     if (!audio) return;
     audioRef.current = audio;
     const ac = audio.ctx as AudioContext;
-    let unlocked = false; // has the browser let audio run yet?
 
-    // The context reports every start and stop here, including the first one.
+    // Some browsers start audio on their own; keep it quiet unless sound is on.
     const onState = () => {
-      const isRunning = ac.state === 'running';
-      if (isRunning && !unlocked) {
-        unlocked = true;
-        if (getSoundPref()) audio.enable(true);
-        else audio.suspend();
-      }
-      setRunning(isRunning);
-    };
-    const unlock = (e: Event) => {
-      if (e.target instanceof Node && buttonRef.current?.contains(e.target)) return;
-      if (getSoundPref() && !audio.running) audio.enable(true);
+      if (ac.state === 'running' && !getSoundPref()) audio.suspend();
     };
     const onVisibility = () => {
       if (document.hidden) audio.suspend();
-      else if (getSoundPref() && unlocked) audio.enable(true);
+      else if (getSoundPref()) audio.enable(true);
     };
-    // Every event a browser may count as the first user gesture (they differ by browser).
-    const gestures = ['pointerdown', 'pointerup', 'mousedown', 'click', 'keydown', 'touchend'] as const;
     ac.addEventListener('statechange', onState);
-    gestures.forEach((g) => window.addEventListener(g, unlock, { capture: true }));
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
-      gestures.forEach((g) => window.removeEventListener(g, unlock, { capture: true }));
       document.removeEventListener('visibilitychange', onVisibility);
       ac.removeEventListener('statechange', onState);
       audio.close();
@@ -1101,34 +1083,22 @@ export default function Shoreline() {
     };
   }, []);
 
-  const ui: SoundUi = !soundOn ? 'off' : running ? 'on' : 'blocked';
-
   const toggleSound = useCallback(() => {
-    const audio = audioRef.current;
-    if (ui === 'blocked') {
-      audio?.enable(true);
-      return;
-    }
     const next = !soundOn;
     setSoundPref(next);
-    audio?.enable(next);
-  }, [ui, soundOn]);
+    audioRef.current?.enable(next);
+  }, [soundOn]);
 
-  const label = ui === 'on' ? 'Mute wave sounds' : ui === 'off' ? 'Unmute wave sounds' : 'Turn on wave sounds';
+  const label = soundOn ? 'Mute wave sounds' : 'Play wave sounds';
 
   return (
     <main style={{ position: 'fixed', inset: 0, background: BG, overflow: 'hidden', fontFamily: FONT_STACK }}>
       <style>{`
         .surf-link, .surf-sound { transition: color 160ms ease, opacity 160ms ease; }
         .surf-link { color: ${LINK_COLOR}; }
-        .surf-sound { color: ${ICON_COLOR}; }
+        .surf-sound { color: ${LINK_COLOR}; }
         .surf-link:hover, .surf-sound:hover { color: ${HOVER_COLOR}; }
         .surf-link:focus-visible, .surf-sound:focus-visible { outline: 1px solid ${HOVER_COLOR}; outline-offset: 2px; }
-        .surf-sound[data-state='blocked'] svg { animation: surf-pulse 2.4s ease-in-out infinite; }
-        @keyframes surf-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
-        @media (prefers-reduced-motion: reduce) {
-          .surf-sound[data-state='blocked'] svg { animation: none; opacity: 0.7; }
-        }
       `}</style>
 
       <canvas
@@ -1149,53 +1119,50 @@ export default function Shoreline() {
           gap: 4,
         }}
       >
-        <nav aria-label="Primary" style={{ display: 'flex', gap: 4, marginLeft: -10 }}>
-          {LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="surf-link"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                minHeight: 44,
-                padding: '0 10px',
-                fontSize: 14,
-                textDecoration: 'none',
-              }}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: -10 }}>
+          <nav aria-label="Primary" style={{ display: 'flex', gap: 4 }}>
+            {LINKS.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="surf-link"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  minHeight: 44,
+                  padding: '0 10px',
+                  fontSize: 14,
+                  textDecoration: 'none',
+                }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <button
+            type="button"
+            className="surf-sound"
+            data-state={soundOn ? 'on' : 'off'}
+            aria-label={label}
+            aria-pressed={soundOn}
+            title={label}
+            onClick={toggleSound}
+            style={{
+              width: 44,
+              height: 44,
+              display: 'grid',
+              placeItems: 'center',
+              padding: 0,
+              border: 0,
+              borderRadius: 8,
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+          >
+            <SoundIcon muted={!soundOn} />
+          </button>
+        </div>
       </div>
-
-      <button
-        ref={buttonRef}
-        type="button"
-        className="surf-sound"
-        data-state={ui}
-        aria-label={label}
-        aria-pressed={ui === 'on'}
-        title={label}
-        onClick={toggleSound}
-        style={{
-          position: 'fixed',
-          top: 16,
-          right: 16,
-          width: 44,
-          height: 44,
-          display: 'grid',
-          placeItems: 'center',
-          padding: 0,
-          border: 0,
-          borderRadius: 8,
-          background: 'transparent',
-          cursor: 'pointer',
-        }}
-      >
-        <SoundIcon muted={ui === 'off'} />
-      </button>
     </main>
   );
 }
@@ -1203,8 +1170,8 @@ export default function Shoreline() {
 function SoundIcon({ muted }: { muted: boolean }) {
   return (
     <svg
-      width="22"
-      height="22"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
