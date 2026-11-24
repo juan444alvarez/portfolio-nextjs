@@ -1,5 +1,19 @@
 'use client';
 
+/**
+ * Shoreline — homepage hero: an ASCII surf experiment.
+ *
+ * A bird's-eye surf experiment: ocean at the top of the viewport, sand at the
+ * bottom. Every visit opens on a calm sea and one big swell rolling in from the
+ * top. After that, heavy waves arrive in slow sets (mostly mid-sized, one or two
+ * big ones placed at random). Each wave reaches further in a few places, with
+ * thicker foam there, then drains away completely, leaving clean sand. The water
+ * flows around the links instead of over them.
+ *
+ * Everything is procedural: noise-driven foam on a <canvas> character grid, and
+ * Web Audio surf synthesized from filtered noise (no assets, no dependencies).
+ */
+
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
@@ -42,7 +56,7 @@ const RHYTHM = {
 } as const;
 
 const REST = 0.17; // resting waterline, fraction of viewport height
-const OPEN_REACH = 0.93; // furthest the swash may run where nothing is in the way
+const OPEN_REACH = 0.97; // furthest the swash may run where nothing is in the way
 
 /* ─────────────────────────── Helpers ──────────────────────────── */
 
@@ -242,10 +256,9 @@ type Wave = {
   up: number; // seconds: run-up
   hold: number; // seconds: slack at max reach
   down: number; // seconds: backwash
-  lobes: Float32Array; // [freq, amp, phase] × 3 — scalloped edge
-  bulgeX: number; // where the tongue of the swash reaches furthest
-  bulgeW: number;
-  bulgeA: number;
+  shape: Float32Array; // per column: scalloped edge + tongues that run further
+  thick: Float32Array; // per column: foam thickness multiplier (0.45 – 2)
+  pan: number; // stereo position of the biggest tongue
   wobble: number;
   rollW: number; // rows of dense foam behind the front
   fizz: number;
@@ -271,6 +284,7 @@ class Surf {
   private rest: Float32Array;
   private limit: Float32Array; // furthest reach per column (fraction of height)
   private sprayD: Float32Array;
+  private thickCol: Float32Array; // foam thickness along the current waterline
   private rand: () => number;
   private noise: Perlin;
   private laceA: Worley;
@@ -278,7 +292,8 @@ class Surf {
   private bubbles: Worley;
   private rhythm: SetRhythm;
   private nextSpawn = 0;
-  private laceExt = 14; // rows of lace behind the waterline, follows recent wave size
+  private introAt = -1;
+  private laceExt = 12; // rows of lace behind the waterline, follows recent wave size
   private rs: number; // row scale vs. a 62-row reference screen
 
   constructor(readonly cols: number, readonly rows: number, seed: number) {
@@ -292,6 +307,7 @@ class Surf {
     this.rest = new Float32Array(cols);
     this.limit = new Float32Array(cols).fill(OPEN_REACH);
     this.sprayD = new Float32Array(cols);
+    this.thickCol = new Float32Array(cols).fill(1);
     this.rand = mulberry32(seed);
     this.noise = new Perlin(this.rand);
     this.laceA = new Worley(4.6, this.rand);
@@ -306,6 +322,12 @@ class Surf {
     this.limit.set(limit.subarray(0, this.cols));
   }
 
+  /** Calm sea, then one big swell rolls in from the top: the first thing a visitor sees. */
+  introSwell(delay: number) {
+    this.nextSpawn = Infinity;
+    this.introAt = this.t + delay;
+  }
+
   /** Run the sea for a few seconds without drawing so the page opens mid-wave. */
   prewarm(seconds: number) {
     const dt = 1 / FPS;
@@ -313,36 +335,63 @@ class Surf {
     this.nextSpawn = Math.min(this.nextSpawn, this.t + 1.5);
   }
 
-  private spawn(size: number): Wave {
+  private spawn(size: number, intro = false): Wave {
     const r = this.rand;
-    const lobes = new Float32Array(9);
-    const base: [number, number][] = [
-      [1.0, 0.022],
-      [2.6, 0.02],
-      [5.2, 0.009],
-    ];
-    base.forEach(([f, a], k) => {
-      lobes[k * 3] = f * (0.8 + 0.5 * r());
-      lobes[k * 3 + 1] = a * (0.6 + 0.9 * size);
-      lobes[k * 3 + 2] = r() * TAU;
-    });
+    const { cols } = this;
+    // Scalloped edge: three gentle sine lobes
+    const lobes = [1.0, 2.6, 5.2].map((f, k) => ({
+      f: f * (0.8 + 0.5 * r()),
+      a: [0.022, 0.02, 0.009][k] * (0.6 + 0.9 * size),
+      p: r() * TAU,
+    }));
+    // Tongues: 1–3 places where the swash runs further down the beach
+    const count = intro ? 2 : 1 + (r() < 0.55 ? 1 : 0) + (r() < 0.25 ? 1 : 0);
+    const tongues = Array.from({ length: count }, () => ({
+      x: 0.08 + 0.84 * r(),
+      w: 0.05 + 0.1 * r(),
+      a: (0.03 + 0.12 * r()) * (0.4 + 0.6 * size),
+    }));
+    // Foam thickness along the shore: broad, smooth bands (not noise), heavier on the tongues
+    const f1 = 0.7 + 1.1 * r();
+    const f2 = 2 + 1.5 * r();
+    const p1 = r() * TAU;
+    const p2 = r() * TAU;
+    const shape = new Float32Array(cols);
+    const thick = new Float32Array(cols);
+    let panW = 0;
+    let panX = 0;
+    for (let c = 0; c < cols; c++) {
+      const x = (c + 0.5) / cols;
+      let edge = 0;
+      for (const l of lobes) edge += l.a * Math.sin(TAU * l.f * x + l.p);
+      let tg = 0;
+      for (const t of tongues) {
+        const dx = x - t.x;
+        tg += t.a * Math.exp(-(dx * dx) / (2 * t.w * t.w));
+      }
+      shape[c] = edge + tg;
+      const band = 0.65 * Math.sin(TAU * f1 * x + p1) + 0.35 * Math.sin(TAU * f2 * x + p2);
+      thick[c] = Math.max(0.45, Math.min(2, 1 + 0.5 * band + 6 * tg));
+      panW += tg;
+      panX += tg * x;
+    }
+    const pan = panW > 0 ? Math.max(-0.8, Math.min(0.8, (panX / panW - 0.5) * 1.4)) : 0;
     const w: Wave = {
       t0: this.t,
       size,
-      start: REST - 0.05 - 0.08 * size,
-      reach: REST + 0.07 + 0.6 * size,
-      up: 3.2 + 2.8 * size,
-      hold: 0.5 + 0.6 * size,
-      down: 4.2 + 3.2 * size,
-      lobes,
-      bulgeX: 0.12 + 0.76 * r(),
-      bulgeW: 0.07 + 0.1 * r(),
-      bulgeA: (0.02 + 0.12 * r()) * size,
+      start: intro ? -0.06 : REST - 0.05 - 0.08 * size,
+      reach: REST + 0.09 + 0.66 * size,
+      up: intro ? 6.8 : 3.2 + 2.8 * size,
+      hold: intro ? 1.1 : 0.5 + 0.6 * size,
+      down: intro ? 7.6 : 4.2 + 3.2 * size,
+      shape,
+      thick,
+      pan,
       wobble: r() * 100,
       rollW: (2.6 + 6.5 * size) * this.rs,
       fizz: 0.7 + 0.9 * size,
       deposit: 0.85 + 0.15 * size,
-      front: new Float32Array(this.cols),
+      front: new Float32Array(cols),
       strength: 1,
       rollScale: 1,
     };
@@ -353,7 +402,7 @@ class Surf {
   private updateFront(w: Wave) {
     const { cols, rows, noise, t, limit } = this;
     const age = t - w.t0;
-    const { up, hold, down, lobes } = w;
+    const { up, hold, down } = w;
     let phase: 0 | 1 | 2;
     let e: number;
     if (age < up) {
@@ -373,14 +422,7 @@ class Surf {
       w.rollScale = 0.45 + 0.3 * (1 - e);
     }
     for (let c = 0; c < cols; c++) {
-      const x = (c + 0.5) / cols;
-      let shape =
-        lobes[1] * Math.sin(TAU * lobes[0] * x + lobes[2]) +
-        lobes[4] * Math.sin(TAU * lobes[3] * x + lobes[5]) +
-        lobes[7] * Math.sin(TAU * lobes[6] * x + lobes[8]);
-      const bx = x - w.bulgeX;
-      shape += w.bulgeA * Math.exp(-(bx * bx) / (2 * w.bulgeW * w.bulgeW));
-      shape += 0.035 * noise.noise(c * 0.021, w.wobble + age * 0.04);
+      const shape = w.shape[c] + 0.035 * noise.noise(c * 0.021, w.wobble + age * 0.04);
       const reach = softCap(w.reach + shape, limit[c]);
       let pos: number;
       if (phase === 0) pos = lerp(Math.min(w.start + 0.4 * shape, reach), reach, e);
@@ -399,17 +441,19 @@ class Surf {
     this.laceB.update(t);
     this.bubbles.update(t);
 
-    if (t >= this.nextSpawn) {
+    let spawned: Wave | null = null;
+    if (this.introAt >= 0 && t >= this.introAt) {
+      this.introAt = -1;
+      spawned = this.spawn(1, true);
+      this.nextSpawn = t + spawned.up + spawned.hold + 1.5;
+    } else if (t >= this.nextSpawn) {
       const s = this.rhythm.next();
-      const w = this.spawn(s.size);
+      spawned = this.spawn(s.size);
       this.nextSpawn = t + s.gap;
-      this.onWave?.({
-        size: s.size,
-        pan: Math.max(-0.8, Math.min(0.8, (w.bulgeX - 0.5) * 1.4)),
-        up: w.up,
-        hold: w.hold,
-        down: w.down,
-      });
+    }
+    if (spawned) {
+      const { size, pan, up, hold, down } = spawned;
+      this.onWave?.({ size, pan, up, hold, down });
     }
 
     for (let c = 0; c < cols; c++) {
@@ -421,13 +465,22 @@ class Surf {
       this.updateFront(w);
       if (w.size > biggest) biggest = w.size;
     }
-    const targetExt = (14 + 30 * biggest) * rs;
+    const targetExt = (12 + 20 * biggest) * rs;
     this.laceExt += (targetExt - this.laceExt) * (1 - Math.exp(-dt / 2.5));
 
     // Waterline = furthest reach of any wave (or the resting sea).
+    const thickBlend = 1 - Math.exp(-dt / 1.5);
     for (let c = 0; c < cols; c++) {
       let e = this.rest[c];
-      for (const w of this.waves) if (w.front[c] > e) e = w.front[c];
+      let edge: Wave | null = null;
+      for (const w of this.waves) {
+        if (w.front[c] > e) {
+          e = w.front[c];
+          edge = w;
+        }
+      }
+      const thickTarget = edge ? lerp(1, edge.thick[c], clamp01(edge.strength * 1.5)) : 1;
+      this.thickCol[c] += (thickTarget - this.thickCol[c]) * thickBlend;
       E[c] = e;
       vE[c] = (e - prevE[c]) / Math.max(dt, 1e-3);
       prevE[c] = e;
@@ -467,7 +520,7 @@ class Surf {
 
   /** Decide one character per cell. */
   private shade() {
-    const { cols, rows, rs, t, noise, E, sprayD, glyph, waves, laceA, laceB, bubbles, laceExt } = this;
+    const { cols, rows, rs, t, noise, E, sprayD, glyph, waves, laceA, laceB, bubbles, laceExt, thickCol } = this;
     const F = this.F;
     const deepTop = 0.12 * rows;
 
@@ -482,8 +535,10 @@ class Surf {
 
         if (d > 0) {
           // Lace: a thick web of foam behind the waterline, fed by what the rolls leave
-          const band = smooth(0, laceExt * 0.2, d) * (1 - smooth(laceExt * 0.5, laceExt, d));
-          const amount = Math.max(F[i] * 1.5, band * 0.8);
+          const tk = thickCol[c]; // thicker, deeper foam in some stretches of shore
+          const ext = laceExt * (0.55 + 0.45 * tk);
+          const band = smooth(0, ext * 0.2, d) * (1 - smooth(ext * 0.5, ext, d));
+          const amount = Math.max(F[i] * 1.5, band * (0.55 + 0.25 * tk));
           if (amount > 0.12) {
             const Yl = Y - 0.7 * e * CELL_ASPECT; // texture slides with the swash
             laceA.eval(c, Yl);
@@ -491,9 +546,9 @@ class Surf {
             laceB.eval(c + 41, Yl + 3);
             const e2 = laceB.f2 - laceB.f1;
             // foam gathers in clumps: thicker web inside a patch, open water between
-            const patch = smooth(-0.15, 0.35, noise.noise(c * 0.027 + 300, Yl * 0.027 + t * 0.02));
-            const thick = 0.18 + 0.2 * patch * Math.min(1, amount);
-            let lt = (1 - smooth(0.05, thick, e1)) * 0.95 + (1 - smooth(0.04, 0.1 + 0.08 * patch, e2)) * 0.5;
+            const patch = smooth(-0.15, 0.35, noise.noise(c * 0.021 + 300, Yl * 0.034 + t * 0.02)); // drifts along the shore
+            const web = 0.18 + 0.2 * patch * Math.min(1, amount) + 0.05 * (tk - 1);
+            let lt = (1 - smooth(0.05, web, e1)) * 0.95 + (1 - smooth(0.04, 0.1 + 0.08 * patch, e2)) * 0.5;
             if (lt > 1) lt = 1;
             const v = Math.min(1, amount * (0.55 + 0.7 * patch)) * lt * (0.12 + 0.95 * patch);
             if (v >= 0.16 && v > dens) {
@@ -545,11 +600,12 @@ class Surf {
           const w = waves[wi];
           if (w.strength < 0.01) continue;
           const dd = w.front[c] - r;
-          const rwMax = w.rollW * w.rollScale * 1.7;
+          const tk = w.thick[c];
+          const rwMax = w.rollW * w.rollScale * tk * 1.7;
           if (dd < -1.2 || dd > rwMax) continue;
           const dde = dd + noise.noise(c * 0.21 + 400, Y * 0.21 + t * 0.5) * w.fizz;
           const clump = noise.noise(c * 0.054 + 500, Y * 0.054 + t * 0.08);
-          const rw = w.rollW * w.rollScale * (1 + 0.6 * clump);
+          const rw = w.rollW * w.rollScale * tk * (1 + 0.6 * clump);
           let roll = smooth(-0.6, 0.6, dde) * (1 - smooth(rw * 0.45, rw, dde));
           if (roll > 0.01) {
             bubbles.eval(c, Y - w.front[c] * CELL_ASPECT * 0.9);
@@ -559,7 +615,7 @@ class Surf {
           roll += 0.45 * smooth(-0.6, 0.3, dde) * (1 - smooth(0.4, 2, dde));
           roll *= w.strength;
           if (roll > 0.02 && d > 0) {
-            const dep = roll * w.deposit;
+            const dep = roll * w.deposit * (0.75 + 0.25 * tk);
             if (dep > F[i]) F[i] = dep;
           }
           if (roll > dens) {
@@ -634,7 +690,7 @@ function draw(ctx: CanvasRenderingContext2D, surf: Surf, atlas: Atlas, cw: numbe
 function reachLimit(box: DOMRect | undefined, cols: number, rows: number, cw: number, ch: number, dpr: number) {
   const limit = new Float32Array(cols).fill(OPEN_REACH);
   if (!box || box.width === 0) return limit;
-  const margin = 5 * (rows / 62); // rows of clear sand above the text (spray included)
+  const margin = 3.5 * (rows / 62); // rows of clear sand above the links (spray included)
   const top = Math.max(REST + 0.2, ((box.top * dpr) / ch - margin) / rows);
   const left = (box.left * dpr) / cw - 4;
   const right = (box.right * dpr) / cw + 4;
@@ -939,6 +995,7 @@ export default function Shoreline() {
     const timeScale = reduceMotion ? 0.45 : 1;
     let surf: Surf | null = null;
     let atlas: Atlas | null = null;
+    let firstSetup = true;
     let cw = 0;
     let ch = 0;
 
@@ -954,7 +1011,10 @@ export default function Shoreline() {
       const rows = Math.ceil(canvas.height / ch);
       surf = new Surf(cols, rows, (Math.random() * 2 ** 31) | 0);
       surf.setLimit(reachLimit(idRef.current?.getBoundingClientRect(), cols, rows, cw, ch, dpr));
-      surf.prewarm(6);
+      // First load: a calm sea, then a big swell. After a resize: resume mid-rhythm.
+      if (firstSetup) surf.introSwell(0.6);
+      else surf.prewarm(6);
+      firstSetup = false;
       surf.onWave = (e) => {
         const audio = audioRef.current;
         if (audio && getSoundPref()) audio.wave(e);
