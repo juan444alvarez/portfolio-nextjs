@@ -1,4 +1,7 @@
 import ChoiceArchitecture from "../../components/ChoiceArchitecture";
+import Slider from "../../components/Slider";
+import ebaraBefore from "../../../public/ebara-before.jpg";
+import ebaraAfter from "../../../public/ebara-after.png";
 
 type Point =
   | { x: number; y: number; pill: string }
@@ -109,12 +112,12 @@ function JourneyChart({
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="overflow-x-clip">
         <div className="mx-auto w-full max-w-[540px] text-pretty">
           <h1 className="max-w-[36ch] text-[22px] font-semibold tracking-tight leading-snug text-balance mt-10">
             Rethinking Product Navigation for $250K+ Industrial Systems
           </h1>
-          <ul className="my-4 flex items-start gap-2 text-[15px]">
+          <ul className="mt-3.5 mb-4.5 flex items-start gap-2 text-[15px]">
           <li>
             <a
               href="https://www.ebaratech.com/"
@@ -122,7 +125,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="inline-flex h-[30px] items-center gap-1.5 rounded-full border border-current/15 px-3 transition-colors hover:border-current/40"
             >
-              <span className="opacity-60">Company</span>
+              <span className="opacity-60">Web Redesign</span>
               <span>Ebara Technologies</span>
               <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M7 17 17 7" />
@@ -132,7 +135,7 @@ export default function Home() {
             </a>
           </li>
           {[
-            ["Role", "Sole Designer"],
+            ["Focus", "Navigation"],
           ].map(([label, value]) => (
             <li key={label} className="inline-flex h-[30px] items-center gap-1.5 rounded-full border border-current/15 px-3">
               <span className="opacity-60">{label}</span>
@@ -140,12 +143,20 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        <hr className="my-5 border-current/20" />
+        <figure className="mx-0 my-5">
+            <Slider
+              before={ebaraBefore}
+              after={ebaraAfter}
+              beforeAlt="The old products page, with all 10 categories shown at once"
+              afterAlt="The redesigned mega menu, with each level opening in place"
+            />
+          </figure>
+        <hr className="border-current/20 mb-3.5" />
           <p className="text-lg mb-3">
             Most of us have never bought anything this expensive online, so my work began with one question:{" "}
             <em>how should navigation work for a purchase like this?</em>
           </p>
-          <p className="text-lg mb-3">I opened by auditing how our navigation presented choices, using site analytics to trace user journeys and drop-off points.</p>
+          <p className="text-lg mb-3">I began by auditing how our navigation presented choices, using site analytics to trace user journeys and drop-off points.</p>
             <p className="text-lg mb-3">Then I interviewed stakeholders (senior leadership and sales reps) to learn who we were designing for. The data and conversations pointed toward two audiences:</p>
           <p className="text-lg mb-3">
   <span className="font-semibold">1. Engineers who know what they need</span>. They’re looking for technical specifications, but layers of navigation stall them.</p>
