@@ -10,7 +10,8 @@
  * thicker foam there, then drains away completely, leaving clean sand. The water
  * flows around the links instead of over them.
  *
- * Sound starts muted. The speaker icon next to the links turns it on.
+ * The links sit in a row of frosted-glass pills, with the sound toggle as a
+ * round pill at the end. Sound starts muted; that pill turns it on.
  *
  * Everything is procedural: noise-driven foam on a <canvas> character grid, and
  * Web Audio surf synthesized from filtered noise (no assets, no dependencies).
@@ -26,7 +27,7 @@ const BG = '#08131D';
 const CLASS_COLORS = ['', '#2E5672', '#7DB4CE', '#F2FBFF', '#A6D3E8'];
 const RAMPS = ['', ' .-~~≈', ' .·:°o~oO', ' .·:oO0@@', ' .°o'];
 const FOAM_GLOW = 'rgba(170, 225, 255, 0.45)';
-const LINK_COLOR = '#8FAABA';
+const PILL_COLOR = '#CFE2EB';
 const HOVER_COLOR = '#F2FBFF';
 const FONT_STACK = 'ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", monospace';
 
@@ -1094,11 +1095,34 @@ export default function Shoreline() {
   return (
     <main style={{ position: 'fixed', inset: 0, background: BG, overflow: 'hidden', fontFamily: FONT_STACK }}>
       <style>{`
-        .surf-link, .surf-sound { transition: color 160ms ease, opacity 160ms ease; }
-        .surf-link { color: ${LINK_COLOR}; }
-        .surf-sound { color: ${LINK_COLOR}; }
-        .surf-link:hover, .surf-sound:hover { color: ${HOVER_COLOR}; }
-        .surf-link:focus-visible, .surf-sound:focus-visible { outline: 1px solid ${HOVER_COLOR}; outline-offset: 2px; }
+        .surf-pill {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 36px;
+          padding: 0 18px;
+          box-sizing: border-box;
+          border-radius: 999px;
+          border: 1px solid rgba(242, 251, 255, 0.12);
+          background: rgba(16, 36, 52, 0.5);
+          -webkit-backdrop-filter: blur(14px) saturate(140%);
+          backdrop-filter: blur(14px) saturate(140%);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 8px 24px rgba(0, 0, 0, 0.25);
+          color: ${PILL_COLOR};
+          font: inherit;
+          font-size: 15px;
+          letter-spacing: 0.02em;
+          text-decoration: none;
+          cursor: pointer;
+          transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+        }
+        .surf-pill:hover {
+          color: #FFFFFF;
+          border-color: rgba(242, 251, 255, 0.38);
+          background: rgba(28, 56, 78, 0.62);
+        }
+        .surf-pill:focus-visible { outline: 1px solid ${HOVER_COLOR}; outline-offset: 3px; }
+        .surf-pill--icon { width: 36px; padding: 0; }
       `}</style>
 
       <canvas
@@ -1119,45 +1143,22 @@ export default function Shoreline() {
           gap: 4,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: -10 }}>
-          <nav aria-label="Primary" style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <nav aria-label="Primary" style={{ display: 'flex', gap: 8 }}>
             {LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="surf-link"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  minHeight: 44,
-                  padding: '0 10px',
-                  fontSize: 14,
-                  textDecoration: 'none',
-                }}
-              >
+              <Link key={l.href} href={l.href} className="surf-pill">
                 {l.label}
               </Link>
             ))}
           </nav>
           <button
             type="button"
-            className="surf-sound"
+            className="surf-pill surf-pill--icon"
             data-state={soundOn ? 'on' : 'off'}
             aria-label={label}
             aria-pressed={soundOn}
             title={label}
             onClick={toggleSound}
-            style={{
-              width: 44,
-              height: 44,
-              display: 'grid',
-              placeItems: 'center',
-              padding: 0,
-              border: 0,
-              borderRadius: 8,
-              background: 'transparent',
-              cursor: 'pointer',
-            }}
           >
             <SoundIcon muted={!soundOn} />
           </button>
