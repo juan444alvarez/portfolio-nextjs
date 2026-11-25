@@ -151,13 +151,15 @@ export default function Home() {
               afterAlt="The redesigned mega menu, with each level opening in place"
             />
           </figure>
-        <hr className="border-current/20 mb-3.5" />
           <p className="text-lg mb-3">
-            Most of us have never bought anything this expensive online, so my work began with one question:{" "}
+            Most of us have never bought anything this expensive online, so my work began by asking:{" "}
             <em>how should navigation work for a purchase like this?</em>
           </p>
-          <p className="text-lg mb-3">I began by auditing how our navigation presented choices, using site analytics to trace user journeys and drop-off points.</p>
-            <p className="text-lg mb-3">Then I interviewed stakeholders (senior leadership and sales reps) to learn who we were designing for. The data and conversations pointed toward two audiences:</p>
+          <hr className="border-current/20 mb-3.5" />
+
+          <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Untangling Choice Architecture</h2>
+          <p className="text-lg mb-3">To explore that question, I interviewed stakeholders (senior leadership & sales reps) and audited our navigation’s choice architecture.</p>
+<p className="text-lg mb-3"> something here. Combined, the qualitative and quantitative findings pointed toward two audiences:</p>
           <p className="text-lg mb-3">
   <span className="font-semibold">1. Engineers who know what they need</span>. They’re looking for technical specifications, but layers of navigation stall them.</p>
           <figure className="mx-0 mb-10">
@@ -170,12 +172,13 @@ export default function Home() {
             <JourneyChart {...newBuyerJourney} />
           </figure>
           <p className="text-lg mb-3">Though they arrived with different goals, both were nudged away by high interaction costs before finding what they came for.</p>
-          <p className="text-lg mb-3">Engineers make larger purchases, so they became our primary audience, with visitors as a close secondary.</p>
+          <hr className="border-current/20 mb-3.5" />
+
 
           <h2 className="max-w-[36ch] text-[21px] font-semibold tracking-tight leading-snug text-balance mb-3">Forming Hypotheses</h2>
 <p className="text-lg mb-8">Thinking inversely, I started from where users dropped off and designed backward. That led to two hypotheses.</p>
 
-<dl className="mb-8 grid gap-x-6 gap-y-6 border-t border-current/15 pt-6 sm:grid-cols-[9rem_1fr]">
+<dl className="mb-8 grid gap-x-6 gap-y-6 pt-6 sm:grid-cols-[9rem_1fr]">
   <dt className="font-semibold">Findability</dt>
   <dd className="text-lg opacity-80">Through progressive disclosure, a guided path would lead users to what they need, instead of leaving them to find it alone.</dd>
   <dt className="font-semibold">Performance</dt>
