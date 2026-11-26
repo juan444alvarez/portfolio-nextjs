@@ -718,6 +718,9 @@ class SurfAudio {
   private brown: AudioBuffer;
   private crackle: AudioBuffer;
   private bedStarted = false;
+  private wanted = false; // whether sound should be playing right now
+  private suspendTimer = 0;
+  private waveOuts = new Set<AudioNode>();
 
   static create(): SurfAudio | null {
     const AC =
@@ -773,6 +776,9 @@ class SurfAudio {
     const ac = this.ctx as AudioContext;
     const now = ac.currentTime;
     const g = this.master.gain;
+    // A quick mute → unmute must not let the mute's delayed suspend fire afterwards.
+    this.wanted = on;
+    window.clearTimeout(this.suspendTimer);
     g.cancelScheduledValues(now);
     g.setValueAtTime(g.value, now);
     if (on) {
@@ -786,8 +792,8 @@ class SurfAudio {
       g.linearRampToValueAtTime(0.9, now + 1.5);
     } else {
       g.linearRampToValueAtTime(0, now + 0.35);
-      window.setTimeout(() => {
-        if (this.master.gain.value < 0.01) void ac.suspend?.().catch(() => undefined);
+      this.suspendTimer = window.setTimeout(() => {
+        if (!this.wanted) void ac.suspend?.().catch(() => undefined);
       }, 450);
     }
   }
@@ -796,8 +802,10 @@ class SurfAudio {
     void (this.ctx as AudioContext).suspend?.().catch(() => undefined);
   }
 
-  close() {
-    void (this.ctx as AudioContext).close?.().catch(() => undefined);
+  /** Silence waves still scheduled from an earlier visit to the page. */
+  dropWaves() {
+    this.waveOuts.forEach((out) => out.disconnect());
+    this.waveOuts.clear();
   }
 
   wave({ size, pan, up, hold, down }: WaveEvent) {
@@ -813,6 +821,7 @@ class SurfAudio {
       out = (ctx as BaseAudioContext).createGain();
     }
     out.connect(this.master);
+    this.waveOuts.add(out);
     const end = t + up + hold + down + 1;
     const att = 0.45 + 0.5 * (1 - size); // gentle swell into the break
 
@@ -868,7 +877,10 @@ class SurfAudio {
       g.exponentialRampToValueAtTime(0.0001, tb + down);
     });
 
-    window.setTimeout(() => out.disconnect(), (end - ctx.currentTime + 0.5) * 1000);
+    window.setTimeout(() => {
+      out.disconnect();
+      this.waveOuts.delete(out);
+    }, (end - ctx.currentTime + 0.5) * 1000);
   }
 
   private buffer(seconds: number, fill: () => number) {
@@ -956,8 +968,14 @@ class SurfAudio {
 // Muted at the start of every visit; the visitor turns it on with the speaker icon.
 // Kept outside React and read with useSyncExternalStore, so nothing has to copy
 // it into state from an effect.
+//
+// The audio engine lives out here too, for the whole visit. It is created by the
+// first unmute click (the gesture browsers need before playing audio), paused when
+// the visitor leaves the landing page, and resumed when they come back, so the
+// preference and what is actually playing can't drift apart.
 
 let soundPref = false;
+let surfAudio: SurfAudio | null = null;
 const soundPrefListeners = new Set<() => void>();
 
 const getSoundPref = () => soundPref;
@@ -967,6 +985,9 @@ function setSoundPref(on: boolean) {
   soundPref = on;
   soundPrefListeners.forEach((listener) => listener());
 }
+
+// Events that count as a user gesture for audio (touch taps end on pointerup/touchend).
+const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'keydown'] as const;
 
 function subscribeSoundPref(listener: () => void) {
   soundPrefListeners.add(listener);
@@ -980,7 +1001,6 @@ function subscribeSoundPref(listener: () => void) {
 export default function Shoreline() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const idRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<SurfAudio | null>(null);
   const soundOn = useSyncExternalStore(subscribeSoundPref, getSoundPref, getSoundPrefOnServer);
 
   // Sea + render loop
@@ -1014,8 +1034,7 @@ export default function Shoreline() {
       else surf.prewarm(6);
       firstSetup = false;
       surf.onWave = (e) => {
-        const audio = audioRef.current;
-        if (audio && getSoundPref()) audio.wave(e);
+        if (surfAudio && getSoundPref()) surfAudio.wave(e);
       };
       atlas = buildAtlas(cw, ch);
       draw(ctx, surf, atlas, cw, ch);
@@ -1058,36 +1077,52 @@ export default function Shoreline() {
     };
   }, []);
 
-  // Sound: muted until the visitor clicks the speaker icon. That click is also the
-  // user gesture browsers require before a page may play audio.
+  // Sound: muted until the visitor clicks the speaker icon (see toggleSound).
   useEffect(() => {
-    const audio = SurfAudio.create();
-    if (!audio) return;
-    audioRef.current = audio;
-    const ac = audio.ctx as AudioContext;
+    // Back on the landing page with sound on: drop waves left from the last visit
+    // (the master was faded to silence before pausing, so this is inaudible) and
+    // fade back in.
+    if (surfAudio && getSoundPref()) {
+      surfAudio.dropWaves();
+      surfAudio.enable(true);
+    }
 
-    // Some browsers start audio on their own; keep it quiet unless sound is on.
-    const onState = () => {
-      if (ac.state === 'running' && !getSoundPref()) audio.suspend();
+    // If the browser still holds audio paused (iOS can, e.g. after a call or
+    // backgrounding), the visitor's next tap or key press anywhere resumes it.
+    // The speaker button handles its own taps in toggleSound.
+    const unlock = (e: Event) => {
+      if (!surfAudio || surfAudio.running || !getSoundPref()) return;
+      if (e.target instanceof Element && e.target.closest('[data-sound-toggle]')) return;
+      surfAudio.enable(true);
     };
     const onVisibility = () => {
-      if (document.hidden) audio.suspend();
-      else if (getSoundPref()) audio.enable(true);
+      if (!surfAudio) return;
+      if (document.hidden) surfAudio.suspend();
+      else if (getSoundPref()) surfAudio.enable(true);
     };
-    ac.addEventListener('statechange', onState);
+    for (const type of UNLOCK_EVENTS) window.addEventListener(type, unlock, true);
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
+      for (const type of UNLOCK_EVENTS) window.removeEventListener(type, unlock, true);
       document.removeEventListener('visibilitychange', onVisibility);
-      ac.removeEventListener('statechange', onState);
-      audio.close();
-      audioRef.current = null;
+      // Leaving the landing page: fade out and pause. The preference is kept, and
+      // the engine is reused when the visitor comes back.
+      surfAudio?.enable(false);
     };
   }, []);
 
   const toggleSound = useCallback(() => {
+    // Created inside the click: the user gesture browsers require before playing audio.
+    if (!surfAudio) surfAudio = SurfAudio.create();
+    // Icon says on, but the browser is holding audio paused: this tap starts it
+    // rather than muting, so one tap always does what the visitor expects.
+    if (soundOn && surfAudio && !surfAudio.running) {
+      surfAudio.enable(true);
+      return;
+    }
     const next = !soundOn;
     setSoundPref(next);
-    audioRef.current?.enable(next);
+    surfAudio?.enable(next);
   }, [soundOn]);
 
   const label = soundOn ? 'Mute wave sounds' : 'Play wave sounds';
@@ -1154,6 +1189,7 @@ export default function Shoreline() {
           <button
             type="button"
             className="surf-pill surf-pill--icon"
+            data-sound-toggle=""
             data-state={soundOn ? 'on' : 'off'}
             aria-label={label}
             aria-pressed={soundOn}
